@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Ecommerce_BE_API.DbContext": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:55110;http://localhost:55111"
+    }
+  }
+}
