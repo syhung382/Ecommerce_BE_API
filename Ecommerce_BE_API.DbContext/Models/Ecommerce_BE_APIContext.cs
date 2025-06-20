@@ -1,5 +1,4 @@
 ﻿using Ecommerce_BE_API.DbContext.Base;
-using Ecommerce_BE_API.DbContext.Models.drafts;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
@@ -42,7 +41,28 @@ namespace Ecommerce_BE_API.DbContext.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
+            modelBuilder.Entity<MstUser>(entity =>
+            {
+                entity.ToTable("MstUser");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Avatar).HasMaxLength(250);
+                entity.Property(e => e.CodeInvite)
+                    .HasMaxLength(10)
+                    .IsFixedLength();
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+                entity.Property(e => e.CurrentSession)
+                    .HasMaxLength(10)
+                    .IsFixedLength();
+                entity.Property(e => e.Email).HasMaxLength(250);
+                entity.Property(e => e.FullName).HasMaxLength(250);
+                entity.Property(e => e.LastLoginDate).HasColumnType("datetime");
+                entity.Property(e => e.Password).HasMaxLength(250);
+                entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+                entity.Property(e => e.UserName)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+            });
 
             OnModelCreatingPartial(modelBuilder);
         }

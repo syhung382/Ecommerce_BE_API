@@ -1,4 +1,5 @@
-﻿using Ecommerce_BE_API.WebApi.Models.Response;
+﻿using Ecommerce_BE_API.DbContext.Models.Utils;
+using Ecommerce_BE_API.WebApi.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -8,7 +9,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Ecommerce_BE_API.WebApi.Controllers
+namespace Ecommerce_BE_API.WebApi.Controllers.Base
 {
     public class BaseApiController : Controller
     {
@@ -42,7 +43,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers
                 expires: DateTime.Now.AddYears(1),
                 signingCredentials: creds);
 
-            var tokenString = (new JwtSecurityTokenHandler().WriteToken(token));
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
             return tokenString;
         }
 

@@ -55,7 +55,7 @@ namespace Ecommerce_BE_API.DbContext.Models.Utils
         SuperAdmin = 4,
     }
 
-    public enum bannedEnum
+    public enum BannedEnum
     {
         [Description("Không")]
         No = 0,
@@ -87,5 +87,11 @@ namespace Ecommerce_BE_API.DbContext.Models.Utils
         TemporarilyDeleted = 1,
     }
 
-
+    public enum IsFirstLoginEnum
+    {
+        [Description("Chưa từng đăng nhập")]
+        NeverLoggedIn = 0,
+        [Description("Đã từng đăng nhập")]
+            AlreadyLoggedIn = 1,
+    }
 }

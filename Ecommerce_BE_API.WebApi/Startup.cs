@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Ecommerce_BE_API.DbContext;
+using Ecommerce_BE_API.Services.Implements;
+using Ecommerce_BE_API.Services.Interfaces;
 using Ecommerce_BE_API.WebApi.AutoMapper;
 using Ecommerce_BE_API.WebApi.BackgroundServices;
 using Ecommerce_BE_API.WebApi.Resources;
@@ -88,7 +90,7 @@ namespace Ecommerce_BE_API.WebApi
 
             // Config Services
             services.ConfigureDbContext(mainConnectString);
-            //services.AddScoped<IMstSalesOrderRecallsService, MstSalesOrderRecallsService>();
+            services.AddScoped<IMstUserService, MstUserService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // Schedule task

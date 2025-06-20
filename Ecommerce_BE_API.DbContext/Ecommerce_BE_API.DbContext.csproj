@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\drafts\" />
     <Folder Include="DbScripts\" />
     <Folder Include="Models\Filters\" />
   </ItemGroup>
