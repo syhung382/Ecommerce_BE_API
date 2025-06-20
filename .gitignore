@@ -179,6 +179,8 @@ DocProject/Help/html
 # Click-Once directory
 publish/
 
+Ecommerce_BE_API.DbContext/Models/drafts
+
 # Publish Web Output
 *.[Pp]ublish.xml
 *.azurePubxml
