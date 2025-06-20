@@ -267,5 +267,36 @@ namespace Ecommerce_BE_API.Services.Utils
             var info = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
             return String.Format(info, "{0:c}", value);
         }
+
+        //check enum
+        public static bool IsUserRoleEnum(int value)
+        {
+            return Enum.IsDefined(typeof(Ecommerce_BE_API.DbContext.Models.Utils.UserRoleEnum), value);
+        }
+        public static bool IsGenderEnum(int value)
+        {
+            return Enum.IsDefined(typeof(Ecommerce_BE_API.DbContext.Models.Utils.GenderEnum), value);
+        }
+        public static bool IsAdminRoleEnum(int value)
+        {
+            return Enum.IsDefined(typeof(Ecommerce_BE_API.DbContext.Models.Utils.AdminRoleEnum), value);
+        }
+        public static bool IsBannedEnum(int value)
+        {
+            return Enum.IsDefined(typeof(Ecommerce_BE_API.DbContext.Models.Utils.bannedEnum), value);
+        }
+        public static bool IsDeleteFlagEnum(int value)
+        {
+            return Enum.IsDefined(typeof(Ecommerce_BE_API.DbContext.Models.Utils.DeleteFlagEnum), value);
+        }
+        public static bool IsActivedEnum(int value)
+        {
+            return Enum.IsDefined(typeof(Ecommerce_BE_API.DbContext.Models.Utils.ActiveEnum), value);
+        }
+        public static bool IsUserStatusEnum(int value)
+        {
+            return Enum.IsDefined(typeof(Ecommerce_BE_API.DbContext.Models.Utils.UserStatusEnum), value);
+        }
     }
 }
+

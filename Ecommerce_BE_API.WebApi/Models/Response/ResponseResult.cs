@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using Ecommerce_BE_API.DbContext.Models;
+using Ecommerce_BE_API.DbContext.Models.Utils;
 
 namespace Ecommerce_BE_API.WebApi.Models.Response
 {
@@ -31,23 +32,6 @@ namespace Ecommerce_BE_API.WebApi.Models.Response
 
     }
 
-    public enum RetCodeEnum
-    {
-        [Description("OK")]
-        Ok = 0,
-        [Description("Api Error")]
-        ApiError = 1,
-        [Description("Not Exists")]
-        ResultNotExists = 2,
-        [Description("Parammeters Invalid")]
-        ParammetersInvalid = 3,
-        [Description("Parammeters Not Found")]
-        ParammetersNotFound = 4,
-        [Description("Not delete")]
-        ApiNoDelete = 5,
-        [Description("Not Role")]
-        ApiNotRole = 6
-    }
     public class ApiSuccessResult<T> : ApiResult<T>
     {
         public ApiSuccessResult(T data)

@@ -25,6 +25,7 @@
   <ItemGroup>
     <Folder Include="Extensions\" />
     <Folder Include="Models\Request\" />
+    <Folder Include="Models\Utils\" />
   </ItemGroup>
 
 </Project>
