@@ -4,7 +4,6 @@ using Ecommerce_BE_API.DbContext.Models.Utils;
 using Ecommerce_BE_API.Services.Interfaces;
 using Ecommerce_BE_API.Services.Logger;
 using Ecommerce_BE_API.WebApi.Controllers.Base;
-using Ecommerce_BE_API.WebApi.Extensions;
 using Ecommerce_BE_API.WebApi.Models.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,7 +13,6 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[MiddlewareFilter(typeof(LocalizationPipeline))]
     public class UserController : BaseApiController
     {
         private readonly ILoggerService _logger;
@@ -49,8 +47,8 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
             }
         }
 
-        [HttpGet]
         [Route("Get")]
+        [HttpGet]
         public async Task<ResponseResult<string>> get()
         {
             try

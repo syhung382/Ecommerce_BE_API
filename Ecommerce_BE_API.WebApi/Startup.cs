@@ -2,9 +2,9 @@
 using Ecommerce_BE_API.DbContext;
 using Ecommerce_BE_API.Services.Implements;
 using Ecommerce_BE_API.Services.Interfaces;
+using Ecommerce_BE_API.Services.Logger;
 using Ecommerce_BE_API.WebApi.AutoMapper;
 using Ecommerce_BE_API.WebApi.BackgroundServices;
-using Ecommerce_BE_API.WebApi.Resources;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -19,6 +19,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -48,15 +49,9 @@ namespace Ecommerce_BE_API.WebApi
                     });
             });
 
-            services.AddSingleton<LocService>();
-
-            services.AddLocalization(otp => otp.ResourcesPath = "Resources");
-
             services.AddMvc();
 
             services.AddControllers();
-
-            services.ConfigureBackground();
 
             services.AddSwaggerGen(swa =>
             {
@@ -90,6 +85,7 @@ namespace Ecommerce_BE_API.WebApi
 
             // Config Services
             services.ConfigureDbContext(mainConnectString);
+            services.AddScoped<ILoggerService, LoggerService>();
             services.AddScoped<IMstUserService, MstUserService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -105,7 +101,7 @@ namespace Ecommerce_BE_API.WebApi
             services.AddSingleton(mapper);
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-            // Config Token
+            //Config Token
             var issuer = Configuration.GetValue<string>("Tokens:Issuer");
             var signingKey = Configuration.GetValue<string>("Tokens:Key");
             var signingKeyBytes = System.Text.Encoding.UTF8.GetBytes(signingKey);

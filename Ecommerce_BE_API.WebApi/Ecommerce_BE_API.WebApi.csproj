@@ -23,8 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Extensions\" />
     <Folder Include="Models\Request\" />
     <Folder Include="Models\Utils\" />
+    <Folder Include="Resources\" />
   </ItemGroup>
 
 </Project>
