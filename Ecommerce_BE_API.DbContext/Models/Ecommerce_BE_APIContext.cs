@@ -1,7 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Ecommerce_BE_API.DbContext.Base;
+using Ecommerce_BE_API.DbContext.Models.drafts;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
-using Ecommerce_BE_API.DbContext.Base;
 
 namespace Ecommerce_BE_API.DbContext.Models
 {
@@ -17,6 +18,8 @@ namespace Ecommerce_BE_API.DbContext.Models
             : base(options)
         {
         }
+
+        public virtual DbSet<MstUser> MstUsers { get; set; }
 
         // <summary>
 
@@ -36,6 +39,13 @@ namespace Ecommerce_BE_API.DbContext.Models
         }
 
         // <summary>
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            
+
+            OnModelCreatingPartial(modelBuilder);
+        }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 
