@@ -4,7 +4,7 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
 {
     public class MstUserRegisterReq
     {
-        public string? Email { get; set; }
+        public string Email { get; set; }
 
         public string? FullName { get; set; }
 

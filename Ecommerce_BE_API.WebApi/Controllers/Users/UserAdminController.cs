@@ -27,7 +27,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
 
         [HttpGet]
         [Route("TestToken")]
-        public async Task<ResponseResult<string>> testToken(string token)
+        public async Task<ResponseResult<string>> testToken()
         {
             try
             {
