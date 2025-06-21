@@ -90,8 +90,8 @@ namespace Ecommerce_BE_API.DbContext.Models.Utils
     public enum IsFirstLoginEnum
     {
         [Description("Chưa từng đăng nhập")]
-        NeverLoggedIn = 0,
+        FirstLoggedIn = 0,
         [Description("Đã từng đăng nhập")]
-            AlreadyLoggedIn = 1,
+        AlreadyLoggedIn = 1,
     }
 }

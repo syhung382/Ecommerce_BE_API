@@ -27,7 +27,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
         }
 
         [HttpPost]
-        [Route("AddUser")]
+        [Route("UserAdd")]
         public async Task<ResponseResult<MstUser>> CreateUserAsync([FromBody] MstUserRegisterReq userReq)
         {
             try
@@ -47,19 +47,64 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
             }
         }
 
-        [Route("Get")]
-        [HttpGet]
-        public async Task<ResponseResult<string>> get()
+        [HttpPost]
+        [Route("UserLoginByUsernamePassword")]
+        public async Task<ResponseResult<UserLoginRes>> LoginUserByUsernamePasswordAsync([FromBody] LoginReq req)
         {
             try
             {
-                return new ResponseResult<string>(RetCodeEnum.Ok, "ok", "ok");
+                var response = await _userService.SyncUserInfoByUsernamePasswordAsync(req);
+                if (response == null) throw new Exception("Username or Password incorrect!");
+                if (response.IsBanned == (int)BannedEnum.Yes) throw new Exception("Account has been banned!");
+                if (response.DeleteFlag == (int)DeleteFlagEnum.Yes) throw new Exception("Account has been deleted!");
+
+                var tokenGenerator = CreateToken(response);
+
+                var result = new UserLoginRes()
+                {
+                    Id = response.Id,
+                    FullName = response.FullName,
+                    UserName = response.UserName,
+                    Email = response.Email,
+                    Avatar = response.Avatar,
+                    Gender = response.Gender,
+                    Role = response.Role,
+                    RoleAdmin = response.RoleAdmin,
+                    InviteUserId = response.InviteUserId,
+                    InviteUserCount = response.InviteUserCount,
+                    CodeInvite = response.CodeInvite,
+                    IsFirstLogin = response.IsFirstLogin,
+                    LastLoginDate = response.LastLoginDate,
+                    CurrentSession = response.CurrentSession,
+                    Token = tokenGenerator,
+                    CreatedAt = response.CreatedAt,
+                    CreatedBy = response.CreatedBy,
+                    UpdatedAt = response.UpdatedAt,
+                    UpdatedBy = response.UpdatedBy,
+                };
+                return new ResponseResult<UserLoginRes>(RetCodeEnum.Ok, "Login successfully!", result);
             }
             catch (Exception ex)
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
-                return new ResponseResult<string>(RetCodeEnum.ApiError, ex.Message, null);
+                return new ResponseResult<UserLoginRes>(RetCodeEnum.ApiError, ex.Message, null);
             }
         }
+
+        #region "Private Methods"
+        private string CreateToken(MstUser user)
+        {
+            if (user == null) return string.Empty;
+
+            var tokenString = CreateTokenString(
+                string.IsNullOrEmpty(user.Email) ? user.Email : user.Email,
+                user.FullName ?? user.Email,
+                user.Id.ToString(),
+                user.UserName,
+                _config["Tokens:Key"],
+                _config["Tokens:Issuer"]);
+            return tokenString;
+        }
+        #endregion "Private Methods"
     }
 }

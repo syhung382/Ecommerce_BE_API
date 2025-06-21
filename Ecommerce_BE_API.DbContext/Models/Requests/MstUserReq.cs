@@ -14,4 +14,10 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
 
         public int Gender { get; set; }
     }
+
+    public class LoginReq
+    {
+        public required string UserName { get; set; }
+        public required string Password { get; set; }
+    }
 }

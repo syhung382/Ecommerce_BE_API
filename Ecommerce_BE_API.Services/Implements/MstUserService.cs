@@ -1,6 +1,4 @@
-﻿
-
-using Ecommerce_BE_API.DbContext.Common;
+﻿using Ecommerce_BE_API.DbContext.Common;
 using Ecommerce_BE_API.DbContext.Models;
 using Ecommerce_BE_API.DbContext.Models.Requests;
 using Ecommerce_BE_API.DbContext.Models.Utils;
@@ -9,6 +7,7 @@ using Ecommerce_BE_API.Services.Logger;
 using Ecommerce_BE_API.Services.Utils;
 using Microsoft.Extensions.Configuration;
 using System.Configuration;
+using System.Data.Entity;
 
 namespace Ecommerce_BE_API.Services.Implements
 {
@@ -28,75 +27,66 @@ namespace Ecommerce_BE_API.Services.Implements
         public async Task<MstUser> AddUserInfoAsync(MstUserRegisterReq userRequest)
         {
             var KeyEncrypt = Configuration["Tokens:Key"];
-            try
-            {
-                var req = new MstUser
-                {
-                    Email = userRequest.Email,
-                    FullName = userRequest.FullName,
-                    UserName = userRequest.UserName,
-                    Password = FunctionUtils.CreateSHA256(KeyEncrypt, userRequest.Password),
-                    IsActived = (int)ActiveEnum.No,
-                    Gender = userRequest.Gender,
-                    Role = (int)UserRoleEnum.User,
-                    IsFirstLogin = (int)IsFirstLoginEnum.NeverLoggedIn,
-                    DeleteFlag = (int)DeleteFlagEnum.No,
-                    IsBanned = (int)BannedEnum.No,
-                    Status = (int)UserStatusEnum.Active,
-                    CreatedAt = DateTime.Now,
-                    CreatedBy = 0,
-                };
-                var res = await _unitOfWork.Repository<MstUser>().AddAsync(req);
-                await _unitOfWork.SaveChangesAsync();
 
-                return res.Entity;
-            }
-            catch(Exception ex)
+            var req = new MstUser
             {
-                _logger.WriteErrorLog(ex);
-            }
-            return null;
+                Email = userRequest.Email,
+                FullName = userRequest.FullName,
+                UserName = userRequest.UserName,
+                Password = FunctionUtils.CreateSHA256(KeyEncrypt, userRequest.Password),
+                IsActived = (int)ActiveEnum.No,
+                Gender = userRequest.Gender,
+                Role = (int)UserRoleEnum.User,
+                IsFirstLogin = (int)IsFirstLoginEnum.FirstLoggedIn,
+                DeleteFlag = (int)DeleteFlagEnum.No,
+                IsBanned = (int)BannedEnum.No,
+                Status = (int)UserStatusEnum.Active,
+                CreatedAt = DateTime.Now,
+                CreatedBy = 0,
+            };
+            var res = await _unitOfWork.Repository<MstUser>().AddAsync(req);
+            await _unitOfWork.SaveChangesAsync();
+
+            return res.Entity;
         }
 
         public async Task<MstUser> AddUserInfoAsync(MstUserRegisterReq userRequest, MstUser userInvite, int? currentId, bool IsActive = false)
         {
             var KeyEncrypt = Configuration["Tokens:Key"];
 
-            try
+            var req = new MstUser
             {
+                Email = userRequest.Email,
+                FullName = userRequest.FullName,
+                UserName = userRequest.UserName,
+                Password = FunctionUtils.CreateSHA256(KeyEncrypt, userRequest.Password),
+                IsActived = (int)ActiveEnum.No,
+                Gender = userRequest.Gender,
+                InviteUserId = userInvite.Id,
+                Role = (int)UserRoleEnum.User,
+                IsFirstLogin = (int)IsFirstLoginEnum.FirstLoggedIn,
+                DeleteFlag = (int)DeleteFlagEnum.No,
+                IsBanned = (int)BannedEnum.No,
+                Status = (int)UserStatusEnum.Active,
+                CreatedAt = DateTime.Now,
+                CreatedBy = currentId ?? 0,
+            };
+            var res = await _unitOfWork.Repository<MstUser>().AddAsync(req);
+            await _unitOfWork.SaveChangesAsync();
 
-                var req = new MstUser
-                {
-                    Email = userRequest.Email,
-                    FullName = userRequest.FullName,
-                    UserName = userRequest.UserName,
-                    Password = FunctionUtils.CreateSHA256(KeyEncrypt, userRequest.Password),
-                    IsActived = (int)ActiveEnum.No,
-                    Gender = userRequest.Gender,
-                    InviteUserId = userInvite.Id,
-                        Role = (int)UserRoleEnum.User,
-                    IsFirstLogin = (int)IsFirstLoginEnum.NeverLoggedIn,
-                    DeleteFlag = (int)DeleteFlagEnum.No,
-                    IsBanned = (int)BannedEnum.No,
-                    Status = (int)UserStatusEnum.Active,
-                    CreatedAt = DateTime.Now,
-                    CreatedBy = currentId ?? 0,
-                };
-                var res = await _unitOfWork.Repository<MstUser>().AddAsync(req);
-                await _unitOfWork.SaveChangesAsync();
-
-                return res.Entity;
-            }
-            catch(Exception ex)
-            {
-                _logger.WriteErrorLog(ex);
-            }
-            return null;
+            return res.Entity;
         }
-
-        public Task<MstUser> syncUserInfoAsync(MstUser userRequest)
+        public async Task<MstUser> SyncUserInfoByUsernamePasswordAsync(LoginReq loginReq)
         {
-            throw new NotImplementedException();
+            var KeyEncrypt = Configuration["Tokens:Key"];
+            var password = FunctionUtils.CreateSHA256(KeyEncrypt, loginReq.Password);
+            var userRes = await _unitOfWork.Repository<MstUser>()
+                                            .Where(x => x.UserName == loginReq.UserName 
+                                                        && x.Password == password 
+                                                        && x.Status == (int)UserStatusEnum.Active)
+                                            .AsNoTracking().FirstOrDefaultAsync();
+
+            return userRes;
         }
     }
 }

@@ -22,7 +22,6 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Base
             string fullName,
             string userId,
             string userName,
-            string userPhone,
             string tokenKey,
             string tokenIssuer)
         {
@@ -32,7 +31,6 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Base
                     new Claim(ClaimTypes.GivenName, fullName),
                     new Claim(ClaimTypes.Sid, userId),
                     new Claim(ClaimTypes.Name, userName),
-                    new Claim(ClaimTypes.MobilePhone, userPhone)
                 };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

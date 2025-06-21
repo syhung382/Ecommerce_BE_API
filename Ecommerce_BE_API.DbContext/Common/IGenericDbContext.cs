@@ -9,7 +9,7 @@ namespace Ecommerce_BE_API.DbContext.Common
     public interface IGenericDbContext<T> where T : Microsoft.EntityFrameworkCore.DbContext, IContext, IDisposable
     {
         DatabaseFacade Database { get; }
-        DbSet<T> Repository<T>() where T : class;
+        DbSet<TModel> Repository<TModel>() where TModel : class;
         int SaveChanges();
         Task<int> SaveChangesAsync();
         void Dispose();
