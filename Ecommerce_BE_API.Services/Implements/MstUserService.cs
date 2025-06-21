@@ -7,7 +7,7 @@ using Ecommerce_BE_API.Services.Logger;
 using Ecommerce_BE_API.Services.Utils;
 using Microsoft.Extensions.Configuration;
 using System.Configuration;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce_BE_API.Services.Implements
 {
@@ -78,13 +78,14 @@ namespace Ecommerce_BE_API.Services.Implements
         }
         public async Task<MstUser> SyncUserInfoByUsernamePasswordAsync(LoginReq loginReq)
         {
-            var KeyEncrypt = Configuration["Tokens:Key"];
+            var KeyEncrypt = Configuration["Tokens:KeyUser"];
             var password = FunctionUtils.CreateSHA256(KeyEncrypt, loginReq.Password);
             var userRes = await _unitOfWork.Repository<MstUser>()
-                                            .Where(x => x.UserName == loginReq.UserName 
-                                                        && x.Password == password 
-                                                        && x.Status == (int)UserStatusEnum.Active)
-                                            .AsNoTracking().FirstOrDefaultAsync();
+                                            .Where(x => x.UserName == loginReq.UserName
+                                                    && x.Password == password
+                                                    && x.Status == (int)UserStatusEnum.Active)
+                                            .AsNoTracking()
+                                            .FirstOrDefaultAsync();
 
             return userRes;
         }

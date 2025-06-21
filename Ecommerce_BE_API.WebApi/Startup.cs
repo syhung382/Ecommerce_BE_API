@@ -145,6 +145,8 @@ namespace Ecommerce_BE_API.WebApi
 
             app.UseRouting();
 
+            app.UseAuthentication();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

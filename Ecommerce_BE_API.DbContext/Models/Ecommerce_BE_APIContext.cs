@@ -24,7 +24,7 @@ namespace Ecommerce_BE_API.DbContext.Models
 
         public DbSet<TModel> Repository<TModel>() where TModel : class
         {
-            return base.Set<TModel>();
+            return Set<TModel>();
         }
 
         public int SaveChange()
