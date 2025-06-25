@@ -30,7 +30,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
 
         [HttpPost]
         [Route("UserAdd")]
-        public async Task<ResponseResult<MstUsers>> CreateUserAsync([FromBody] MstUserRegisterReq userReq)
+        public async Task<ResponseResult<MstUser>> CreateUserAsync([FromBody] MstUserRegisterReq userReq)
         {
             try
             {
@@ -40,12 +40,12 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
 
                 var res = await _userService.AddUserInfoAsync(userReq);
 
-                return new ResponseResult<MstUsers>(RetCodeEnum.Ok, "Add user successfully!", res);
+                return new ResponseResult<MstUser>(RetCodeEnum.Ok, "Add user successfully!", res);
             }
             catch (Exception ex)
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
-                return new ResponseResult<MstUsers>(RetCodeEnum.ApiError, ex.Message, null);
+                return new ResponseResult<MstUser>(RetCodeEnum.ApiError, ex.Message, null);
             }
         }
 
@@ -104,7 +104,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
         }
 
         #region "Private Methods"
-        private string CreateToken(MstUsers user)
+        private string CreateToken(MstUser user)
         {
             if (user == null) return string.Empty;
 

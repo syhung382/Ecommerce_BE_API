@@ -24,11 +24,11 @@ namespace Ecommerce_BE_API.Services.Implements
         }
         public IConfiguration Configuration { get; }
 
-        public async Task<MstUsers> AddUserInfoAsync(MstUserRegisterReq userRequest)
+        public async Task<MstUser> AddUserInfoAsync(MstUserRegisterReq userRequest)
         {
             var KeyEncrypt = Configuration["Tokens:Key"];
 
-            var req = new MstUsers
+            var req = new MstUser
             {
                 Email = userRequest.Email,
                 FullName = userRequest.FullName,
@@ -44,17 +44,17 @@ namespace Ecommerce_BE_API.Services.Implements
                 CreatedAt = DateTime.Now,
                 CreatedBy = 0,
             };
-            var res = await _unitOfWork.Repository<MstUsers>().AddAsync(req);
+            var res = await _unitOfWork.Repository<MstUser>().AddAsync(req);
             await _unitOfWork.SaveChangesAsync();
 
             return res.Entity;
         }
 
-        public async Task<MstUsers> AddUserInfoAsync(MstUserRegisterReq userRequest, MstUsers userInvite, int? currentId, bool IsActive = false)
+        public async Task<MstUser> AddUserInfoAsync(MstUserRegisterReq userRequest, MstUser userInvite, int? currentId, bool IsActive = false)
         {
             var KeyEncrypt = Configuration["Tokens:Key"];
 
-            var req = new MstUsers
+            var req = new MstUser
             {
                 Email = userRequest.Email,
                 FullName = userRequest.FullName,
@@ -71,16 +71,16 @@ namespace Ecommerce_BE_API.Services.Implements
                 CreatedAt = DateTime.Now,
                 CreatedBy = currentId ?? 0,
             };
-            var res = await _unitOfWork.Repository<MstUsers>().AddAsync(req);
+            var res = await _unitOfWork.Repository<MstUser>().AddAsync(req);
             await _unitOfWork.SaveChangesAsync();
 
             return res.Entity;
         }
-        public async Task<MstUsers> SyncUserInfoByUsernamePasswordAsync(LoginReq loginReq)
+        public async Task<MstUser> SyncUserInfoByUsernamePasswordAsync(LoginReq loginReq)
         {
             var KeyEncrypt = Configuration["Tokens:KeyUser"];
             var password = FunctionUtils.CreateSHA256(KeyEncrypt, loginReq.Password);
-            var userRes = await _unitOfWork.Repository<MstUsers>()
+            var userRes = await _unitOfWork.Repository<MstUser>()
                                             .Where(x => x.UserName == loginReq.UserName
                                                     && x.Password == password
                                                     && x.Status == (int)UserStatusEnum.Active)
@@ -90,9 +90,9 @@ namespace Ecommerce_BE_API.Services.Implements
             return userRes;
         }
 
-        public async Task<MstUsers> UpdateUserInfoAsync(MstUsers user)
+        public async Task<MstUser> UpdateUserInfoAsync(MstUser user)
         {
-            var res = _unitOfWork.Repository<MstUsers>().Update(user);
+            var res = _unitOfWork.Repository<MstUser>().Update(user);
             await _unitOfWork.SaveChangesAsync();
             return res.Entity;
         }

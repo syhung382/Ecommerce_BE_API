@@ -87,6 +87,7 @@ namespace Ecommerce_BE_API.WebApi
             services.ConfigureDbContext(mainConnectString);
             services.AddScoped<ILoggerService, LoggerService>();
             services.AddScoped<IMstUserService, MstUserService>();
+            services.AddScoped<IGlobalService, GlobalService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // Schedule task
