@@ -3,11 +3,13 @@ using Ecommerce_BE_API.DbContext.Models.Requests;
 using Ecommerce_BE_API.DbContext.Models.Utils;
 using Ecommerce_BE_API.Services.Interfaces;
 using Ecommerce_BE_API.Services.Logger;
+using Ecommerce_BE_API.Services.Utils;
 using Ecommerce_BE_API.WebApi.Controllers.Base;
 using Ecommerce_BE_API.WebApi.Models.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Tls;
 
 namespace Ecommerce_BE_API.WebApi.Controllers.Users
 {
@@ -28,7 +30,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
 
         [HttpPost]
         [Route("UserAdd")]
-        public async Task<ResponseResult<MstUser>> CreateUserAsync([FromBody] MstUserRegisterReq userReq)
+        public async Task<ResponseResult<MstUsers>> CreateUserAsync([FromBody] MstUserRegisterReq userReq)
         {
             try
             {
@@ -38,12 +40,12 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
 
                 var res = await _userService.AddUserInfoAsync(userReq);
 
-                return new ResponseResult<MstUser>(RetCodeEnum.Ok, "Add user successfully!", res);
+                return new ResponseResult<MstUsers>(RetCodeEnum.Ok, "Add user successfully!", res);
             }
             catch (Exception ex)
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
-                return new ResponseResult<MstUser>(RetCodeEnum.ApiError, ex.Message, null);
+                return new ResponseResult<MstUsers>(RetCodeEnum.ApiError, ex.Message, null);
             }
         }
 
@@ -57,6 +59,16 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
                 if (response == null) throw new Exception("Username or Password incorrect!");
                 if (response.IsBanned == (int)BannedEnum.Yes) throw new Exception("Account has been banned!");
                 if (response.DeleteFlag == (int)DeleteFlagEnum.Yes) throw new Exception("Account has been deleted!");
+
+                if (string.IsNullOrEmpty(response.CurrentSession))
+                {
+                    var randomNumberGenerator = new UtilsRandomNumberGenerator();
+
+                    response.CurrentSession = randomNumberGenerator.RandomString(8, false);
+
+                    response = await _userService.UpdateUserInfoAsync(response);
+                }
+                
 
                 var tokenGenerator = CreateToken(response);
 
@@ -92,7 +104,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
         }
 
         #region "Private Methods"
-        private string CreateToken(MstUser user)
+        private string CreateToken(MstUsers user)
         {
             if (user == null) return string.Empty;
 
@@ -101,6 +113,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
                 user.FullName ?? user.Email,
                 user.Id.ToString(),
                 user.UserName,
+                user.CurrentSession,
                 _config["Tokens:Key"],
                 _config["Tokens:Issuer"]);
             return tokenString;

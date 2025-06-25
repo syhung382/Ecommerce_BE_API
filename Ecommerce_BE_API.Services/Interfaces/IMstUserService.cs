@@ -16,9 +16,10 @@ namespace Ecommerce_BE_API.Services.Interfaces
 {
     public interface IMstUserService
     {
-        Task<MstUser> AddUserInfoAsync(MstUserRegisterReq userRequest);
-        Task<MstUser> AddUserInfoAsync(MstUserRegisterReq userRequest, MstUser userInvite, int? currentId, bool IsActive = false);
-        Task<MstUser> SyncUserInfoByUsernamePasswordAsync(LoginReq loginReq);
+        Task<MstUsers> AddUserInfoAsync(MstUserRegisterReq userRequest);
+        Task<MstUsers> AddUserInfoAsync(MstUserRegisterReq userRequest, MstUsers userInvite, int? currentId, bool IsActive = false);
+        Task<MstUsers> SyncUserInfoByUsernamePasswordAsync(LoginReq loginReq);
+        Task<MstUsers> UpdateUserInfoAsync(MstUsers user);
 
     }
 }

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
+using static System.Net.WebRequestMethods;
 
 namespace Ecommerce_BE_API.WebApi.Controllers.Base
 {
@@ -22,6 +23,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Base
             string fullName,
             string userId,
             string userName,
+            string userSection,
             string tokenKey,
             string tokenIssuer)
         {
@@ -31,6 +33,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Base
                     new Claim(ClaimTypes.GivenName, fullName),
                     new Claim(ClaimTypes.Sid, userId),
                     new Claim(ClaimTypes.Name, userName),
+                    new Claim(ClaimTypes.Hash, userSection)
                 };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -133,6 +136,19 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Base
             catch
             {
                 return -1;
+            }
+        }
+        protected string GetCurrentUserSession()
+        {
+            try
+            {
+                var claims = User.Claims.ToList();
+                var sid = User.Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/hash").Value;
+                return sid;
+            }
+            catch
+            {
+                return null;
             }
         }
 

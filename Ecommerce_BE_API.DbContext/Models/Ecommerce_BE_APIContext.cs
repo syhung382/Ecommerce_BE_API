@@ -18,6 +18,14 @@ namespace Ecommerce_BE_API.DbContext.Models
         {
         }
 
+        public virtual DbSet<InfoProductType> InfoProductTypes { get; set; }
+
+        public virtual DbSet<MstCategory> MstCategories { get; set; }
+
+        public virtual DbSet<MstProduct> MstProducts { get; set; }
+
+        public virtual DbSet<MstTypeOfProduct> MstTypeOfProducts { get; set; }
+
         public virtual DbSet<MstUser> MstUsers { get; set; }
 
         // <summary>
@@ -41,9 +49,48 @@ namespace Ecommerce_BE_API.DbContext.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<InfoProductType>(entity =>
+            {
+                entity.ToTable("InfoProductType");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+                entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<MstCategory>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+                entity.Property(e => e.Description).HasMaxLength(500);
+                entity.Property(e => e.Image).HasMaxLength(250);
+                entity.Property(e => e.Title).HasMaxLength(250);
+                entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<MstProduct>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+                entity.Property(e => e.Description).HasMaxLength(500);
+                entity.Property(e => e.Image).HasMaxLength(250);
+                entity.Property(e => e.Title).HasMaxLength(250);
+                entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<MstTypeOfProduct>(entity =>
+            {
+                entity.ToTable("MstTypeOfProduct");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+                entity.Property(e => e.Title).HasMaxLength(250);
+                entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+            });
+
             modelBuilder.Entity<MstUser>(entity =>
             {
-                entity.ToTable("MstUser");
+                entity.HasKey(e => e.Id).HasName("PK_MstUser");
 
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.Avatar).HasMaxLength(250);

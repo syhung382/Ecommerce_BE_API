@@ -31,11 +31,11 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
         {
             try
             {
-                int currentUserId = GetCurrentUserId();
+                var currentSession = GetCurrentUserSession();
 
-                if (currentUserId == 0) throw new Exception("Token is broken!");
+                if (string.IsNullOrEmpty(currentSession)) throw new Exception("Token is broken!");
 
-                return new ResponseResult<string>(RetCodeEnum.Ok, "UserId", currentUserId.ToString());
+                return new ResponseResult<string>(RetCodeEnum.Ok, "userSession", currentSession);
             }
             catch (Exception ex)
             {
