@@ -1,4 +1,5 @@
 ﻿using Ecommerce_BE_API.DbContext.Base;
+using Ecommerce_BE_API.DbContext.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;

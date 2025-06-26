@@ -11,6 +11,8 @@ public partial class MstTypeOfProduct
 
     public int Status { get; set; }
 
+    public bool DeleteFlag { get; set; }
+
     public DateTime CreatedAt { get; set; }
 
     public int CreatedBy { get; set; }
