@@ -87,11 +87,30 @@ namespace Ecommerce_BE_API.DbContext.Models.Utils
         TemporarilyDeleted = 1,
     }
 
+    public enum StatusEnum
+    {
+        [Description("Kích hoạt")]
+        Active = 1,
+        [Description("Chưa kích hoạt")]
+        InActive= 2,
+    }
+
     public enum IsFirstLoginEnum
     {
         [Description("Chưa từng đăng nhập")]
         FirstLoggedIn = 0,
         [Description("Đã từng đăng nhập")]
         AlreadyLoggedIn = 1,
+    }
+
+    public enum CategoryErrorCode
+    {
+        Success = 1,
+        ItemNotFound = 0,
+        ParentNotFound = -1,
+        InvalidStatus = -2,
+        TitleEmpty = -3,
+        HasChildCategory = -4,
+        HasRelatedProduct = -5
     }
 }

@@ -32,7 +32,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers
                 var response = new GlobalRes();
                 var service = new MstService();
 
-                response.ServerTime = DateTime.UtcNow;
+                response.ServerTime = DateTime.Now;
                 response.Uptime = Environment.TickCount64 / 1000;
 
                 var res = await _globalService.CheckConnection();

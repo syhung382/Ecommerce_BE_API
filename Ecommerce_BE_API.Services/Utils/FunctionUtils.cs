@@ -205,27 +205,28 @@ namespace Ecommerce_BE_API.Services.Utils
             sb = sb.Replace('đ', 'd');
             return (sb.ToString().Normalize(NormalizationForm.FormD));
         }
-        public static IQueryable<T> OrderByDynamic<T>(this IQueryable<T> q, string SortField, bool Ascending)
+        public static IQueryable<T> OrderByDynamic<T>(this IQueryable<T> q, string sortField, bool ascending)
         {
             try
             {
-                foreach (PropertyInfo propertyInfo in q.GetType().GetProperties())
+                var property = typeof(T).GetProperty(sortField, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                if (property == null)
                 {
-                    if (propertyInfo.Name != SortField)
-                    {
-                        return q;
-                    }
+                    return q;
                 }
-                SortField = SortField.Substring(0, 1).ToUpper() + SortField.Substring(1, SortField.Length - 1);
-                var param = Expression.Parameter(typeof(T), "p");
-                var prop = Expression.Property(param, SortField);
-                var exp = Expression.Lambda(prop, param);
-                string method = Ascending ? "OrderBy" : "OrderByDescending";
-                Type[] types = new Type[] { q.ElementType, exp.Body.Type };
-                var mce = Expression.Call(typeof(Queryable), method, types, q.Expression, exp);
-                return q.Provider.CreateQuery<T>(mce);
+
+                var parameter = Expression.Parameter(typeof(T), "p");
+                var propertyAccess = Expression.Property(parameter, property.Name); 
+                var orderByExp = Expression.Lambda(propertyAccess, parameter);
+
+                string methodName = ascending ? "OrderBy" : "OrderByDescending";
+                var resultExp = Expression.Call(typeof(Queryable), methodName,
+                    new Type[] { typeof(T), property.PropertyType },
+                    q.Expression, Expression.Quote(orderByExp));
+
+                return q.Provider.CreateQuery<T>(resultExp);
             }
-            catch (Exception ex)
+            catch
             {
                 return q;
             }
@@ -296,6 +297,9 @@ namespace Ecommerce_BE_API.Services.Utils
         public static bool IsUserStatusEnum(int value)
         {
             return Enum.IsDefined(typeof(Ecommerce_BE_API.DbContext.Models.Utils.UserStatusEnum), value);
+        }
+        public static bool IsStatusEnum(int value) {
+            return Enum.IsDefined(typeof(Ecommerce_BE_API.DbContext.Models.Utils.StatusEnum), value);
         }
     }
 }

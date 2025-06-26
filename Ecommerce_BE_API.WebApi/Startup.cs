@@ -88,6 +88,7 @@ namespace Ecommerce_BE_API.WebApi
             services.AddScoped<ILoggerService, LoggerService>();
             services.AddScoped<IMstUserService, MstUserService>();
             services.AddScoped<IGlobalService, GlobalService>();
+            services.AddScoped<IMstCategoryService, MstCategoryService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // Schedule task
