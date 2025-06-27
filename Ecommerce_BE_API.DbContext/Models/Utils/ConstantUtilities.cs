@@ -115,4 +115,11 @@ namespace Ecommerce_BE_API.DbContext.Models.Utils
         PriceInvalid = 5,
         PriceSaleInvalid = 6,
     }
+    public enum ErrorTypeOfProductCode
+    {
+        Success = 0,
+        ItemNotFound = 1,
+        InvalidStatus = 2,
+        TitleEmpty = 3,
+    }
 }
