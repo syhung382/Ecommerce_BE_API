@@ -286,10 +286,6 @@ namespace Ecommerce_BE_API.Services.Utils
         {
             return Enum.IsDefined(typeof(Ecommerce_BE_API.DbContext.Models.Utils.BannedEnum), value);
         }
-        public static bool IsDeleteFlagEnum(int value)
-        {
-            return Enum.IsDefined(typeof(Ecommerce_BE_API.DbContext.Models.Utils.DeleteFlagEnum), value);
-        }
         public static bool IsActivedEnum(int value)
         {
             return Enum.IsDefined(typeof(Ecommerce_BE_API.DbContext.Models.Utils.ActiveEnum), value);
