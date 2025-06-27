@@ -28,7 +28,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
         }
 
         [HttpPost]
-        [Route("Create")]
+        [Route("create")]
         public async Task<ResponseResult<string>> Create([FromBody]MstCategoryReq req)
         {
             var currentId = GetCurrentUserId();
@@ -49,7 +49,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
         }
 
         [HttpPut]
-        [Route("Update")]
+        [Route("update")]
         public async Task<ResponseResult<string>> Update([FromBody]MstCategory req)
         {
             try
@@ -72,7 +72,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
         }
 
         [HttpPost]
-        [Route("List")]
+        [Route("list")]
         public async Task<ResponseResult<ResponseList>> List(MstCategoryFilter filter, int limit = 25, int page = 1)
         {
             try
@@ -88,7 +88,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
         }
 
         [HttpGet]
-        [Route("Detail/{id}")]
+        [Route("detail/{id}")]
         public async Task<ResponseResult<MstCategory>> Get(Guid id)
         {
             try
@@ -106,7 +106,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
         }
 
         [HttpDelete]
-        [Route("Delete")]
+        [Route("delete")]
         public async Task<ResponseResult<string>> Delete([FromBody] List<Guid> listDel)
         {
             try
