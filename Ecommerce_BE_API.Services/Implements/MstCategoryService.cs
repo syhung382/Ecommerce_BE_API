@@ -42,16 +42,16 @@ namespace Ecommerce_BE_API.Services.Implements
             if (req.ParentId != null)
             {
                 var checkParrent = await ValidateParentId(req.ParentId);
-                if (checkParrent == null) return (int)CategoryErrorCode.ParentNotFound;
+                if (checkParrent == null) return (int)ErrorCategoryCode.ParentNotFound;
                 else request.ParentId = checkParrent;
             }
-            if (!FunctionUtils.IsStatusEnum(req.Status)) return (int)CategoryErrorCode.InvalidStatus;
-            if (string.IsNullOrEmpty(req.Title)) return (int)CategoryErrorCode.TitleEmpty;
+            if (!FunctionUtils.IsStatusEnum(req.Status)) return (int)ErrorCategoryCode.InvalidStatus;
+            if (string.IsNullOrEmpty(req.Title)) return (int)ErrorCategoryCode.TitleEmpty;
 
             var res = await _unitOfWork.Repository<MstCategory>().AddAsync(request);
             await _unitOfWork.SaveChangesAsync();
 
-            return (int)CategoryErrorCode.Success;
+            return (int)ErrorCategoryCode.Success;
         }
 
         public async Task<int> UpdateCategoryAsync(MstCategory req, int currentUserId)
@@ -60,17 +60,17 @@ namespace Ecommerce_BE_API.Services.Implements
 
             if(request == null)
             {
-                return (int)CategoryErrorCode.ItemNotFound;
+                return (int)ErrorCategoryCode.ItemNotFound;
             }
 
             if (req.ParentId != null)
             {
                 var checkParrent = await ValidateParentId(req.ParentId);
-                if (checkParrent == null) return (int)CategoryErrorCode.ParentNotFound;
+                if (checkParrent == null) return (int)ErrorCategoryCode.ParentNotFound;
                 else request.ParentId = checkParrent;
             }
-            if (!FunctionUtils.IsStatusEnum(req.Status)) return (int)CategoryErrorCode.InvalidStatus;
-            if (string.IsNullOrEmpty(req.Title)) return (int)CategoryErrorCode.TitleEmpty;
+            if (!FunctionUtils.IsStatusEnum(req.Status)) return (int)ErrorCategoryCode.InvalidStatus;
+            if (string.IsNullOrEmpty(req.Title)) return (int)ErrorCategoryCode.TitleEmpty;
 
             request.Title = req.Title;
             request.Description = req.Description;
@@ -82,7 +82,7 @@ namespace Ecommerce_BE_API.Services.Implements
             var res = _unitOfWork.Repository<MstCategory>().Update(request);
             await _unitOfWork.SaveChangesAsync();
 
-            return (int)CategoryErrorCode.Success;
+            return (int)ErrorCategoryCode.Success;
         }
 
         public async Task<ResponseList> GetListCategoryAsync(MstCategoryFilter filter, int limit = 25, int page = 1)
@@ -146,7 +146,7 @@ namespace Ecommerce_BE_API.Services.Implements
                     {
                         result.Id = item.Id;
                         result.Title = item.Title;
-                        result.Status = (int)CategoryErrorCode.HasChildCategory;
+                        result.Status = (int)ErrorCategoryCode.HasChildCategory;
                         return result;
                     }
 
@@ -154,7 +154,7 @@ namespace Ecommerce_BE_API.Services.Implements
                     {
                         result.Id = item.Id;
                         result.Title = item.Title;
-                        result.Status = (int)CategoryErrorCode.HasRelatedProduct;
+                        result.Status = (int)ErrorCategoryCode.HasRelatedProduct;
                         return result;
                     }
 

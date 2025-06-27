@@ -63,14 +63,6 @@ namespace Ecommerce_BE_API.DbContext.Models.Utils
         Yes = 1,
     }
 
-    public enum  DeleteFlagEnum 
-    {
-        [Description("Không")]
-        No = 0,
-        [Description("Đã xóa")]
-        Yes = 1,
-    }
-
     public enum ActiveEnum
     {
         [Description("Chưa kích hoạt")]
@@ -103,7 +95,7 @@ namespace Ecommerce_BE_API.DbContext.Models.Utils
         AlreadyLoggedIn = 1,
     }
 
-    public enum CategoryErrorCode
+    public enum ErrorCategoryCode
     {
         Success = 1,
         ItemNotFound = 0,
@@ -112,5 +104,15 @@ namespace Ecommerce_BE_API.DbContext.Models.Utils
         TitleEmpty = -3,
         HasChildCategory = -4,
         HasRelatedProduct = -5
+    }
+    public enum ErrorProductCode
+    {
+        Success = 1,
+        ItemNotFound = 0,
+        CategoryNotFound = -1,
+        InvalidStatus = -2,
+        TitleEmpty = -3,
+        PriceInvalid = -4,
+        PriceSaleInvalid = -5,
     }
 }
