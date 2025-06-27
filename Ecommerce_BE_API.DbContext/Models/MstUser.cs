@@ -35,7 +35,7 @@ public partial class MstUser
 
     public DateTime? LastLoginDate { get; set; }
 
-    public int DeleteFlag { get; set; }
+    public bool DeleteFlag { get; set; }
 
     public int IsBanned { get; set; }
 
