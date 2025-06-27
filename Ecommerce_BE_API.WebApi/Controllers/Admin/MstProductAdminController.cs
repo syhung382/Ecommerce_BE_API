@@ -120,7 +120,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
         [HttpDelete]
         [Route("delete")]
-        public async Task<ResponseResult<MstProductDelRes>> delete([FromBody] List<Guid> listId)
+        public async Task<ResponseResult<MstDeletedRes>> delete([FromBody] List<Guid> listId)
         {
             try
             {
@@ -128,11 +128,11 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
                 var res = await _productService.DeleteProductAsync(listId, currentId);
 
-                return new ResponseResult<MstProductDelRes>(RetCodeEnum.Ok, "Xóa sản phẩm thành công!", res);
+                return new ResponseResult<MstDeletedRes>(RetCodeEnum.Ok, "Xóa sản phẩm thành công!", res);
             }catch(Exception ex)
             {
                 await _logger.WriteErrorLogAsync(ex,Request);
-                return new ResponseResult<MstProductDelRes>(RetCodeEnum.ApiError, ex.Message, null);
+                return new ResponseResult<MstDeletedRes>(RetCodeEnum.ApiError, ex.Message, null);
             }
         }
     }

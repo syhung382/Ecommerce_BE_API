@@ -120,51 +120,54 @@ namespace Ecommerce_BE_API.Services.Implements
             return response;
         }
 
-        public async Task<CategoryDelRes> DeleteCategoryAsync(List<Guid> listId, int currentUserId)
+        public async Task<MstDeletedRes> DeleteCategoryAsync(List<Guid> listId, int currentUserId)
         {
-            var result = new CategoryDelRes();
-            result.Status = (int)ErrorCategoryCode.Success;
+            var result = new MstDeletedRes();
 
             var listResponse = await _unitOfWork.Repository<MstCategory>()
                                              .Where(x => listId.Any(p => p == x.Id)
                                                         && x.DeleteFlag != true)
                                              .ToListAsync();
-            if (listResponse.Any())
+            if (!listResponse.Any())
             {
-                var allChildIds = await _unitOfWork.Repository<MstCategory>()
-                                    .Where(x => x.DeleteFlag != true && x.ParentId != null && listId.Contains(x.ParentId.Value))
-                                    .Select(x => x.ParentId.Value)
-                                    .ToListAsync();
+                result.NotFoundIds = listId;
+                return result;
+            }
 
-                var allProductCategoryIds = await _unitOfWork.Repository<MstProduct>()
-                                                             .Where(x => x.DeleteFlag != true && listId.Contains(x.CategoryId))
-                                                             .Select(x => x.CategoryId)
-                                                             .ToListAsync();
+            var existingIds = listResponse.Select(p => p.Id).ToList();
 
-                foreach (var item in listResponse)
+            result.DeletedIds = existingIds;
+            result.NotFoundIds = listId.Except(existingIds).ToList();
+
+            var allChildIds = await _unitOfWork.Repository<MstCategory>()
+                                .Where(x => x.DeleteFlag != true && x.ParentId != null && listId.Contains(x.ParentId.Value))
+                                .Select(x => x.ParentId.Value)
+                                .ToListAsync();
+
+            var allProductCategoryIds = await _unitOfWork.Repository<MstProduct>()
+                                                         .Where(x => x.DeleteFlag != true && listId.Contains(x.CategoryId))
+                                                         .Select(x => x.CategoryId)
+                                                         .ToListAsync();
+
+            var restrictedIds = allChildIds.Union(allProductCategoryIds).Distinct().ToList();
+
+            var canDelete = listResponse.Where(x => !restrictedIds.Contains(x.Id)).ToList();
+
+            var cannotDeleteIds = listResponse.Select(x => x.Id)
+                                     .Where(id => restrictedIds.Contains(id))
+                                     .ToList();
+
+            result.NotFoundIds.AddRange(cannotDeleteIds);
+
+            if (canDelete.Any())
+            {
+                foreach (var item in canDelete)
                 {
-                    if (allChildIds.Contains(item.Id))
-                    {
-                        result.Id = item.Id;
-                        result.Title = item.Title;
-                        result.Status = (int)ErrorCategoryCode.HasChildCategory;
-                        return result;
-                    }
-
-                    if (allProductCategoryIds.Contains(item.Id))
-                    {
-                        result.Id = item.Id;
-                        result.Title = item.Title;
-                        result.Status = (int)ErrorCategoryCode.HasRelatedProduct;
-                        return result;
-                    }
-
                     item.DeleteFlag = true;
                     item.UpdatedAt = DateTime.Now;
                     item.UpdatedBy = currentUserId;
                 }
-
-                _unitOfWork.Repository<MstCategory>().UpdateRange(listResponse);
+                _unitOfWork.Repository<MstCategory>().UpdateRange(canDelete);
                 await _unitOfWork.SaveChangesAsync();
             }
 

@@ -62,46 +62,49 @@ namespace Ecommerce_BE_API.Services.Implements
             return (int)ErrorProductCode.Success;
         }
 
-        public async Task<MstProductDelRes> DeleteProductAsync(List<Guid> listId, int currentUserId)
+        public async Task<MstDeletedRes> DeleteProductAsync(List<Guid> listId, int currentUserId)
         {
-            var result = new MstProductDelRes();
+            var result = new MstDeletedRes();
 
             if (listId == null || !listId.Any()) return result;
 
             var listResponse = await _unitOfWork.Repository<MstProduct>()
                                                 .Where(x => listId.Contains(x.Id) && x.DeleteFlag != true)
                                                 .ToListAsync();
-            if (listResponse.Any())
+            if (!listResponse.Any())
             {
-                var productIds = listResponse.Select(p => p.Id).ToList();
-
-                result.DeletedProductIds = productIds;
-                result.NotFoundProductIds = listId.Except(productIds).ToList();
-
-                var allProductType = await _unitOfWork.Repository<InfoProductType>()
-                                                      .Where(x => productIds.Contains(x.ProductId) && x.DeleteFlag != true)
-                                                      .ToListAsync();
-
-                var utcNow = DateTime.UtcNow;
-
-                foreach (var item in allProductType)
-                {
-                    item.DeleteFlag = true;
-                    item.UpdatedAt = utcNow;
-                    item.UpdatedBy = currentUserId;
-                }
-
-                foreach (var item in listResponse) 
-                {
-                    item.DeleteFlag = true;
-                    item.UpdatedAt = utcNow;
-                    item.UpdatedBy = currentUserId;
-                }
-
-                _unitOfWork.Repository<InfoProductType>().UpdateRange(allProductType);
-                _unitOfWork.Repository<MstProduct>().UpdateRange(listResponse);
-                await _unitOfWork.SaveChangesAsync();
+                result.NotFoundIds = listId;
+                return result;
             }
+
+            var productIds = listResponse.Select(p => p.Id).ToList();
+
+            result.DeletedIds = productIds;
+            result.NotFoundIds = listId.Except(productIds).ToList();
+
+            var allProductType = await _unitOfWork.Repository<InfoProductType>()
+                                                  .Where(x => productIds.Contains(x.ProductId) && x.DeleteFlag != true)
+                                                  .ToListAsync();
+
+            var utcNow = DateTime.UtcNow;
+
+            foreach (var item in allProductType)
+            {
+                item.DeleteFlag = true;
+                item.UpdatedAt = utcNow;
+                item.UpdatedBy = currentUserId;
+            }
+
+            foreach (var item in listResponse)
+            {
+                item.DeleteFlag = true;
+                item.UpdatedAt = utcNow;
+                item.UpdatedBy = currentUserId;
+            }
+
+            _unitOfWork.Repository<InfoProductType>().UpdateRange(allProductType);
+            _unitOfWork.Repository<MstProduct>().UpdateRange(listResponse);
+            await _unitOfWork.SaveChangesAsync();
 
             return result;
         }

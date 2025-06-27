@@ -3,6 +3,7 @@ using Ecommerce_BE_API.DbContext.Models.Requests;
 using Ecommerce_BE_API.DbContext.Models.Utils;
 using Ecommerce_BE_API.Services.Interfaces;
 using Ecommerce_BE_API.Services.Logger;
+using Ecommerce_BE_API.Services.Utils.Response;
 using Ecommerce_BE_API.WebApi.Controllers.Base;
 using Ecommerce_BE_API.WebApi.Models.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -107,7 +108,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
         [HttpDelete]
         [Route("delete")]
-        public async Task<ResponseResult<string>> Delete([FromBody] List<Guid> listDel)
+        public async Task<ResponseResult<MstDeletedRes>> Delete([FromBody] List<Guid> listDel)
         {
             try
             {
@@ -115,23 +116,12 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
                 var res = await _categoryService.DeleteCategoryAsync(listDel, currentId);
 
-                if(res.Status == (int)ErrorCategoryCode.HasChildCategory)
-                {
-                    var error = "Không thể xóa danh mục " + res.Title + " Đang chứa danh mục con!";
-                    throw new Exception(error);
-                }
-                if (res.Status == (int)ErrorCategoryCode.HasRelatedProduct)
-                {
-                    var error = "Không thể xóa danh mục " + res.Title + " Đang chứa sản phẩm!";
-                    throw new Exception(error);
-                }
-
-                return new ResponseResult<string>(RetCodeEnum.Ok, RetCodeEnum.Ok.ToString(), "Xóa thành công");
+                return new ResponseResult<MstDeletedRes>(RetCodeEnum.Ok, "Xóa thành công", res);
             }
             catch (Exception ex) 
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
-                return new ResponseResult<string>(RetCodeEnum.ApiError, ex.Message, null);
+                return new ResponseResult<MstDeletedRes>(RetCodeEnum.ApiError, ex.Message, null);
             }
         }
     }

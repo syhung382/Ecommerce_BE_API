@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Ecommerce_BE_API.Services.Utils.Response
 {
-    public class MstProductDelRes
+    public class MstDeletedRes
     {
-        public List<Guid> DeletedProductIds { get; set; } = new();
-        public List<Guid> NotFoundProductIds { get; set; } = new();
+        public List<Guid> DeletedIds { get; set; } = new();
+        public List<Guid> NotFoundIds { get; set; } = new();
     }
 }
