@@ -28,6 +28,7 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
         public string? Title { get; set; }
         public int? StartPrice { get; set; }
         public int? EndPrice { get; set; }
+        public int? Status { get; set; }
         public string? TypeSort { get; set; }
         public bool? IsDesc { get; set; }
     }

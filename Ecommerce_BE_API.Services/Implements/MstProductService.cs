@@ -129,6 +129,9 @@ namespace Ecommerce_BE_API.Services.Implements
 
             if (filter.EndPrice != null) query = query.Where(x => (x.PriceSale != null && x.PriceSale <= filter.EndPrice)
                                                                     || (x.PriceSale == null && x.Price <= filter.EndPrice));
+
+            if(filter.Status != null) query = query.Where(x => x.Status == filter.Status);
+
             if (!string.IsNullOrEmpty(filter.TypeSort))
             {
                 bool isDesc = filter.IsDesc ?? false;
