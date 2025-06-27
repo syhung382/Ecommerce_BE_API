@@ -82,9 +82,9 @@ namespace Ecommerce_BE_API.DbContext.Models.Utils
     public enum StatusEnum
     {
         [Description("Kích hoạt")]
-        Active = 1,
+        Active = 0,
         [Description("Chưa kích hoạt")]
-        InActive= 2,
+        InActive= 1,
     }
 
     public enum IsFirstLoginEnum
@@ -97,22 +97,22 @@ namespace Ecommerce_BE_API.DbContext.Models.Utils
 
     public enum ErrorCategoryCode
     {
-        Success = 1,
-        ItemNotFound = 0,
-        ParentNotFound = -1,
-        InvalidStatus = -2,
-        TitleEmpty = -3,
-        HasChildCategory = -4,
-        HasRelatedProduct = -5
+        Success = 0,
+        ItemNotFound = 1,
+        ParentNotFound = 2,
+        InvalidStatus = 3,
+        TitleEmpty = 4,
+        HasChildCategory = 5,
+        HasRelatedProduct = 6
     }
     public enum ErrorProductCode
     {
-        Success = 1,
-        ItemNotFound = 0,
-        CategoryNotFound = -1,
-        InvalidStatus = -2,
-        TitleEmpty = -3,
-        PriceInvalid = -4,
-        PriceSaleInvalid = -5,
+        Success = 0,
+        ItemNotFound = 1,
+        CategoryNotFound = 2,
+        InvalidStatus = 3,
+        TitleEmpty = 4,
+        PriceInvalid = 5,
+        PriceSaleInvalid = 6,
     }
 }
