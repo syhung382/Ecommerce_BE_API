@@ -35,9 +35,9 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
             try
             {
                 var res = await _categoryService.AddCategoryAsync(req, currentId);
-                if (res == (int)CategoryErrorCode.ParentNotFound) throw new Exception("Danh mục cha không tồn tại!");
-                if (res == (int)CategoryErrorCode.InvalidStatus) throw new Exception("Trạng thái không đúng!");
-                if (res == (int)CategoryErrorCode.TitleEmpty) throw new Exception("Tên không được để trống!");
+                if (res == (int)ErrorCategoryCode.ParentNotFound) throw new Exception("Danh mục cha không tồn tại!");
+                if (res == (int)ErrorCategoryCode.InvalidStatus) throw new Exception("Trạng thái không đúng!");
+                if (res == (int)ErrorCategoryCode.TitleEmpty) throw new Exception("Tên không được để trống!");
 
                 return new ResponseResult<string>(RetCodeEnum.Ok, "Tạo mới danh mục thành công!", res.ToString());
             }
@@ -57,10 +57,10 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
                 int currentId = GetCurrentUserId();
                 var res = await _categoryService.UpdateCategoryAsync(req, currentId);
 
-                if (res == (int)CategoryErrorCode.ItemNotFound) throw new Exception("Danh mục không tồn tại!");
-                if (res == (int)CategoryErrorCode.ParentNotFound) throw new Exception("Danh mục cha không tồn tại!");
-                if (res == (int)CategoryErrorCode.InvalidStatus) throw new Exception("Trạng thái không đúng!");
-                if (res == (int)CategoryErrorCode.TitleEmpty) throw new Exception("Tên không được để trống!");
+                if (res == (int)ErrorCategoryCode.ItemNotFound) throw new Exception("Danh mục không tồn tại!");
+                if (res == (int)ErrorCategoryCode.ParentNotFound) throw new Exception("Danh mục cha không tồn tại!");
+                if (res == (int)ErrorCategoryCode.InvalidStatus) throw new Exception("Trạng thái không đúng!");
+                if (res == (int)ErrorCategoryCode.TitleEmpty) throw new Exception("Tên không được để trống!");
 
                 return new ResponseResult<string>(RetCodeEnum.Ok, "Cập nhật danh mục thành công!", res.ToString());
             }
@@ -115,12 +115,12 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
                 var res = await _categoryService.DeleteCategoryAsync(listDel, currentId);
 
-                if(res.Status == (int)CategoryErrorCode.HasChildCategory)
+                if(res.Status == (int)ErrorCategoryCode.HasChildCategory)
                 {
                     var error = "Không thể xóa danh mục " + res.Title + " Đang chứa danh mục con!";
                     throw new Exception(error);
                 }
-                if (res.Status == (int)CategoryErrorCode.HasRelatedProduct)
+                if (res.Status == (int)ErrorCategoryCode.HasRelatedProduct)
                 {
                     var error = "Không thể xóa danh mục " + res.Title + " Đang chứa sản phẩm!";
                     throw new Exception(error);
