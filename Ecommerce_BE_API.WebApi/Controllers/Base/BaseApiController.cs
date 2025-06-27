@@ -43,7 +43,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Base
                 tokenIssuer,
                 tokenIssuer,
                 claims,
-                expires: DateTime.Now.AddYears(1),
+                expires: DateTime.Now.AddDays(30),
                 signingCredentials: creds);
 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
