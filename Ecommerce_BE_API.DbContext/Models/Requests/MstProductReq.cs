@@ -20,6 +20,7 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
         public int? PriceSale { get; set; }
 
         public int Status { get; set; }
+        public bool? DeleteFlag { get; set; }
     }
 
     public class MstProductFilter

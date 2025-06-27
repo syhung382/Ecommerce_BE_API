@@ -45,7 +45,7 @@ namespace Ecommerce_BE_API.Services.Implements
                 Detail = req.Detail,
                 Image = req.Image,
                 PriceSale = req.PriceSale,
-                DeleteFlag = false,
+                DeleteFlag = req.DeleteFlag ?? false,
                 Status = req.Status,
                 CreatedAt = DateTime.Now,
                 CreatedBy = currentUserId,

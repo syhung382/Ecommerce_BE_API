@@ -17,6 +17,7 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
         public string? Image { get; set; }
 
         public int Status { get; set; }
+        public bool? DeleteFlag { get; set; }
     }
 
     public partial class MstCategoryFilter

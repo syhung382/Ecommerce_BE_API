@@ -35,6 +35,7 @@ namespace Ecommerce_BE_API.Services.Implements
                 Description = req.Description,
                 Image = req.Image,
                 Status = req.Status,
+                DeleteFlag = req.DeleteFlag ?? false,
                 CreatedAt = DateTime.Now,
                 CreatedBy = currentUserId
             };
