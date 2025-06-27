@@ -108,15 +108,32 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
         {
             if (user == null) return string.Empty;
 
-            var tokenString = CreateTokenString(
+            if(user.Role == (int)UserRoleEnum.Staff && user.RoleAdmin != null)
+            {
+                var tokenString = CreateTokenString(
                 string.IsNullOrEmpty(user.Email) ? user.Email : user.Email,
                 user.FullName ?? user.Email,
                 user.Id.ToString(),
                 user.UserName,
                 user.CurrentSession,
+                (int)user.RoleAdmin,
                 _config["Tokens:Key"],
                 _config["Tokens:Issuer"]);
-            return tokenString;
+                return tokenString;
+            }
+            else
+            {
+                var tokenString = CreateTokenString(
+                string.IsNullOrEmpty(user.Email) ? user.Email : user.Email,
+                user.FullName ?? user.Email,
+                user.Id.ToString(),
+                user.UserName,
+                user.CurrentSession,
+                user.Role,
+                _config["Tokens:Key"],
+                _config["Tokens:Issuer"]);
+                return tokenString;
+            }
         }
         #endregion "Private Methods"
     }

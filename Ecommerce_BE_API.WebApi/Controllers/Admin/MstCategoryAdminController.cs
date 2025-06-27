@@ -13,7 +13,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "3,4,5,6")]
     public class MstCategoryAdminController : BaseApiController
     {
         private readonly ILoggerService _logger;
@@ -117,7 +117,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
                 if(res.Status == (int)CategoryErrorCode.HasChildCategory)
                 {
-                    var error = "Không thể xóa danh mục " + res.Title +" Đang chứa danh mục con!";
+                    var error = "Không thể xóa danh mục " + res.Title + " Đang chứa danh mục con!";
                     throw new Exception(error);
                 }
                 if (res.Status == (int)CategoryErrorCode.HasRelatedProduct)

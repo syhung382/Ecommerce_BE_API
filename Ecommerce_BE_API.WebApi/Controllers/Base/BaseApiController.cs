@@ -24,6 +24,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Base
             string userId,
             string userName,
             string userSection,
+            int userRole,
             string tokenKey,
             string tokenIssuer)
         {
@@ -33,7 +34,8 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Base
                     new Claim(ClaimTypes.GivenName, fullName),
                     new Claim(ClaimTypes.Sid, userId),
                     new Claim(ClaimTypes.Name, userName),
-                    new Claim(ClaimTypes.Hash, userSection)
+                    new Claim(ClaimTypes.Hash, userSection),
+                    new Claim(ClaimTypes.Role, userRole.ToString())
                 };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -163,6 +165,19 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Base
             catch
             {
                 return "";
+            }
+        }
+        protected int GetCurrentUserRole()
+        {
+            try
+            {
+                var claims = User.Claims.ToList();
+                var sid = User.Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role").Value;
+                return int.Parse(sid);
+            }
+            catch
+            {
+                return -1;
             }
         }
         protected string GetHeaderAPIKey()

@@ -46,13 +46,13 @@ namespace Ecommerce_BE_API.DbContext.Models.Utils
     public enum AdminRoleEnum
     {
         [Description("Staff")]
-        Staff = 1,
+        Staff = 3,
         [Description("Moderator")]
-        Moderator = 2,
+        Moderator = 4,
         [Description("Admin")]
-        Admin = 3,
+        Admin = 5,
         [Description("Super Admin")]
-        SuperAdmin = 4,
+        SuperAdmin = 6,
     }
 
     public enum BannedEnum
