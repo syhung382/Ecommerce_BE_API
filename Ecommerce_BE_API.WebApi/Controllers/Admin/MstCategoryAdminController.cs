@@ -28,7 +28,6 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
         }
 
         [HttpPost]
-        [AuthorizeRole(AdminRoleEnum.Admin, AdminRoleEnum.SuperAdmin)]
         [Route("Create")]
         public async Task<ResponseResult<string>> Create([FromBody]MstCategoryReq req)
         {
