@@ -94,7 +94,8 @@ namespace Ecommerce_BE_API.Services.Implements
             if (!string.IsNullOrEmpty(filter.Title)) query = query.Where(x => x.Title.ToLower().Contains(filter.Title.ToLower()));
             if (!string.IsNullOrEmpty(filter.TypeSort))
             {
-                query = FunctionUtils.OrderByDynamic(query, filter.TypeSort, !filter.IsDesc.Value);
+                bool isDesc = filter.IsDesc ?? false;
+                query = FunctionUtils.OrderByDynamic(query, filter.TypeSort, !isDesc);
             }
             else
             {
@@ -122,7 +123,7 @@ namespace Ecommerce_BE_API.Services.Implements
         public async Task<CategoryDelRes> DeleteCategoryAsync(List<Guid> listId, int currentUserId)
         {
             var result = new CategoryDelRes();
-            result.Status = 0;
+            result.Status = (int)ErrorCategoryCode.Success;
 
             var listResponse = await _unitOfWork.Repository<MstCategory>()
                                              .Where(x => listId.Any(p => p == x.Id)
