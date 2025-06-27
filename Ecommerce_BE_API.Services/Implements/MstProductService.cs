@@ -86,7 +86,7 @@ namespace Ecommerce_BE_API.Services.Implements
                                                   .Where(x => productIds.Contains(x.ProductId) && x.DeleteFlag != true)
                                                   .ToListAsync();
 
-            var utcNow = DateTime.UtcNow;
+            var utcNow = DateTime.Now;
 
             foreach (var item in allProductType)
             {
