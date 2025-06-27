@@ -58,7 +58,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
                 var response = await _userService.SyncUserInfoByUsernamePasswordAsync(req);
                 if (response == null) throw new Exception("Username or Password incorrect!");
                 if (response.IsBanned == (int)BannedEnum.Yes) throw new Exception("Account has been banned!");
-                if (response.DeleteFlag == (int)DeleteFlagEnum.Yes) throw new Exception("Account has been deleted!");
+                if (response.DeleteFlag == true) throw new Exception("Account has been deleted!");
 
                 if (string.IsNullOrEmpty(response.CurrentSession))
                 {
