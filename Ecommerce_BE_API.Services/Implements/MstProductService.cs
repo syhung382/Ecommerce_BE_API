@@ -9,6 +9,7 @@ using Ecommerce_BE_API.Services.Utils.Response;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Configuration;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 
 namespace Ecommerce_BE_API.Services.Implements
 {
@@ -56,6 +57,22 @@ namespace Ecommerce_BE_API.Services.Implements
                 request.DiscountId = req.DiscountId;
             }
 
+            if (req.ListTagId != null && req.ListTagId.Any())
+            {
+                var timeNow = DateTime.Now;
+
+                var listProductTags = req.ListTagId.Select(tagId => new InfoProductTag
+                {
+                    Id = Guid.NewGuid(),
+                    ProductId = request.Id,
+                    TagOfProductId = tagId,
+                    CreatedAt = timeNow,
+                    CreatedBy = currentUserId,
+                }).ToList();
+
+                await _unitOfWork.Repository<InfoProductTag>().AddRangeAsync(listProductTags);
+            }
+
             await _unitOfWork.Repository<MstProduct>().AddAsync(request);
             await _unitOfWork.SaveChangesAsync();
 
@@ -82,13 +99,13 @@ namespace Ecommerce_BE_API.Services.Implements
             result.DeletedIds = productIds;
             result.NotFoundIds = listId.Except(productIds).ToList();
 
-            var allProductType = await _unitOfWork.Repository<InfoProductTag>()
+            var allProductTag = await _unitOfWork.Repository<InfoProductTag>()
                                                   .Where(x => productIds.Contains(x.ProductId) && x.DeleteFlag != true)
                                                   .ToListAsync();
 
             var utcNow = DateTime.Now;
 
-            foreach (var item in allProductType)
+            foreach (var item in allProductTag)
             {
                 item.DeleteFlag = true;
                 item.UpdatedAt = utcNow;
@@ -102,7 +119,7 @@ namespace Ecommerce_BE_API.Services.Implements
                 item.UpdatedBy = currentUserId;
             }
 
-            _unitOfWork.Repository<InfoProductTag>().UpdateRange(allProductType);
+            _unitOfWork.Repository<InfoProductTag>().UpdateRange(allProductTag);
             _unitOfWork.Repository<MstProduct>().UpdateRange(listResponse);
             await _unitOfWork.SaveChangesAsync();
 
@@ -156,7 +173,7 @@ namespace Ecommerce_BE_API.Services.Implements
             return result;
         }
 
-        public async Task<int> UpdateProductAsync(MstProduct req, int currentUserId)
+        public async Task<int> UpdateProductAsync(MstProductRes req, int currentUserId)
         {
             var request = await _unitOfWork.Repository<MstProduct>().Where(x => x.Id == req.Id && x.DeleteFlag != true)
                                             .FirstOrDefaultAsync();
@@ -191,6 +208,39 @@ namespace Ecommerce_BE_API.Services.Implements
             if (req.DiscountId != null)
             {
                 request.DiscountId = req.DiscountId;
+            }
+
+            if (req.ListTagRes != null && req.ListTagRes.Any())
+            {
+                var tagIds = req.ListTagRes.Select(t => t.TagOfProductId).Distinct().ToList();
+
+                var existingTags = await _unitOfWork.Repository<InfoProductTag>().Where(x => x.ProductId == request.Id && !x.DeleteFlag)
+                                                    .ToListAsync();
+
+                var tagIdsExist = existingTags.Select(x => x.TagOfProductId).ToHashSet();
+
+                var tagIdsToAdd = tagIds.Except(tagIdsExist).ToList();
+
+                var validTagsToAdd = await _unitOfWork.Repository<MstTagOfProduct>().Where(x => tagIdsToAdd.Contains(x.Id) && !x.DeleteFlag)
+                                                      .AsNoTracking().Select(x => x.Id).ToListAsync();
+
+                var tagsToRemove = existingTags.Where(x => !tagIds.Contains(x.TagOfProductId)).ToList();
+
+                var now = DateTime.Now;
+
+                var newTags = validTagsToAdd.Select(tagId => new InfoProductTag
+                {
+                    Id = Guid.NewGuid(),
+                    ProductId = request.Id,
+                    TagOfProductId = tagId,
+                    CreatedAt = now,
+                    CreatedBy = currentUserId
+                }).ToList();
+
+                if (newTags.Any())
+                    await _unitOfWork.Repository<InfoProductTag>().AddRangeAsync(newTags);
+                if (tagsToRemove.Any())
+                    _unitOfWork.Repository<InfoProductTag>().RemoveRange(tagsToRemove);
             }
 
             _unitOfWork.Repository<MstProduct>().Update(request);
