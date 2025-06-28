@@ -19,13 +19,13 @@ namespace Ecommerce_BE_API.DbContext.Models
         {
         }
 
-        public virtual DbSet<InfoProductType> InfoProductTypes { get; set; }
+        public virtual DbSet<InfoProductTag> InfoProductTypes { get; set; }
 
         public virtual DbSet<MstCategory> MstCategories { get; set; }
 
         public virtual DbSet<MstProduct> MstProducts { get; set; }
 
-        public virtual DbSet<MstTypeOfProduct> MstTypeOfProducts { get; set; }
+        public virtual DbSet<MstTagOfProduct> MstTypeOfProducts { get; set; }
 
         public virtual DbSet<MstUser> MstUsers { get; set; }
 
@@ -50,9 +50,9 @@ namespace Ecommerce_BE_API.DbContext.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<InfoProductType>(entity =>
+            modelBuilder.Entity<InfoProductTag>(entity =>
             {
-                entity.ToTable("InfoProductType");
+                entity.ToTable("InfoProductTag");
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
                 entity.Property(e => e.CreatedAt).HasColumnType("datetime");
@@ -79,7 +79,7 @@ namespace Ecommerce_BE_API.DbContext.Models
                 entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
             });
 
-            modelBuilder.Entity<MstTypeOfProduct>(entity =>
+            modelBuilder.Entity<MstTagOfProduct>(entity =>
             {
                 entity.ToTable("MstTypeOfProduct");
 

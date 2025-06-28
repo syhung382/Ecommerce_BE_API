@@ -15,13 +15,13 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "3,4,5,6")]
-    public class MstTypeOfProductAdminController : BaseApiController
+    public class MstTagOfProductAdminController : BaseApiController
     {
         private readonly ILoggerService _logger;
         private readonly IConfiguration _config;
-        private readonly IMstTypeOfProductService _typeOfProductService;
+        private readonly IMstTagOfProductService _typeOfProductService;
 
-        public MstTypeOfProductAdminController(ILoggerService logger, IConfiguration config, IMstTypeOfProductService typeOfProductService)
+        public MstTagOfProductAdminController(ILoggerService logger, IConfiguration config, IMstTagOfProductService typeOfProductService)
         {
             _logger = logger;
             _config = config;
@@ -52,7 +52,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
         [HttpPut]
         [Route("update")]
-        public async Task<ResponseResult<string>> update([FromBody] MstTypeOfProduct req)
+        public async Task<ResponseResult<string>> update([FromBody] MstTagOfProduct req)
         {
             try
             {
@@ -92,18 +92,18 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
         [HttpGet]
         [Route("detail/{id}")]
-        public async Task<ResponseResult<MstTypeOfProduct>> detail(Guid id)
+        public async Task<ResponseResult<MstTagOfProduct>> detail(Guid id)
         {
             try
             {
                 var res = await _typeOfProductService.GetDetailTypeOfProductAsync(id);
 
-                return new ResponseResult<MstTypeOfProduct>(RetCodeEnum.Ok, "Chi tiết!", res);
+                return new ResponseResult<MstTagOfProduct>(RetCodeEnum.Ok, "Chi tiết!", res);
             }
             catch(Exception ex)
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
-                return new ResponseResult<MstTypeOfProduct>(RetCodeEnum.ApiError, ex.Message, null);
+                return new ResponseResult<MstTagOfProduct>(RetCodeEnum.ApiError, ex.Message, null);
             }
         }
 

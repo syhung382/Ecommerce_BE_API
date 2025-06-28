@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Ecommerce_BE_API.DbContext.Models;
 
-public partial class MstTypeOfProduct
+public partial class MstTagOfProduct
 {
     public Guid Id { get; set; }
 

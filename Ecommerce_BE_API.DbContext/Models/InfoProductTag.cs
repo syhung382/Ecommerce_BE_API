@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace Ecommerce_BE_API.DbContext.Models;
 
-public partial class InfoProductType
+public partial class InfoProductTag
 {
     public Guid Id { get; set; }
 
     public Guid ProductId { get; set; }
 
-    public Guid TypeOfProductId { get; set; }
+    public Guid TagOfProductId { get; set; }
 
     public int Status { get; set; }
 

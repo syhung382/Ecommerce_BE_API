@@ -10,12 +10,12 @@ using System.Data.Entity;
 
 namespace Ecommerce_BE_API.Services.Implements
 {
-    public class MstTypeOfProductService : IMstTypeOfProductService
+    public class MstTagOfProductService : IMstTagOfProductService
     {
         private readonly ILoggerService _logger;
         private readonly IGenericDbContext<Ecommerce_BE_APIContext> _unitOfWork;
 
-        public MstTypeOfProductService(ILoggerService logger, IGenericDbContext<Ecommerce_BE_APIContext> unitOfWork)
+        public MstTagOfProductService(ILoggerService logger, IGenericDbContext<Ecommerce_BE_APIContext> unitOfWork)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
@@ -25,7 +25,7 @@ namespace Ecommerce_BE_API.Services.Implements
             if (string.IsNullOrEmpty(req.Title)) return (int)ErrorTypeOfProductCode.TitleEmpty;
             if (!FunctionUtils.IsStatusEnum(req.Status)) return (int)ErrorTypeOfProductCode.InvalidStatus;
 
-            var request = new MstTypeOfProduct()
+            var request = new MstTagOfProduct()
             {
                 Id = Guid.NewGuid(),
                 Title = req.Title,
@@ -35,7 +35,7 @@ namespace Ecommerce_BE_API.Services.Implements
                 CreatedBy = currentUserId,
             };
 
-            await _unitOfWork.Repository<MstTypeOfProduct>().AddAsync(request);
+            await _unitOfWork.Repository<MstTagOfProduct>().AddAsync(request);
             await _unitOfWork.SaveChangesAsync();
 
             return (int)ErrorTypeOfProductCode.Success;
@@ -47,7 +47,7 @@ namespace Ecommerce_BE_API.Services.Implements
 
             if(listId == null || !listId.Any()) return result;
 
-            var listResponse = await _unitOfWork.Repository<MstTypeOfProduct>().Where(x => x.DeleteFlag != true && listId.Contains(x.Id))
+            var listResponse = await _unitOfWork.Repository<MstTagOfProduct>().Where(x => x.DeleteFlag != true && listId.Contains(x.Id))
                                                                            .ToListAsync();
 
             if(!listResponse.Any())
@@ -72,16 +72,16 @@ namespace Ecommerce_BE_API.Services.Implements
                     item.UpdatedAt = utcNow;
                     item.UpdatedBy = currentUserId;
                 }
-                _unitOfWork.Repository<MstTypeOfProduct>().UpdateRange(listResponse);
+                _unitOfWork.Repository<MstTagOfProduct>().UpdateRange(listResponse);
                 await _unitOfWork.SaveChangesAsync();
             }
 
             return result;
         }
 
-        public async Task<MstTypeOfProduct> GetDetailTypeOfProductAsync(Guid id)
+        public async Task<MstTagOfProduct> GetDetailTypeOfProductAsync(Guid id)
         {
-            var result = await _unitOfWork.Repository<MstTypeOfProduct>().Where(x => x.Id == id && x.DeleteFlag != true)
+            var result = await _unitOfWork.Repository<MstTagOfProduct>().Where(x => x.Id == id && x.DeleteFlag != true)
                                                                          .AsNoTracking().FirstOrDefaultAsync();
             return result;
         }
@@ -90,7 +90,7 @@ namespace Ecommerce_BE_API.Services.Implements
         {
             var result = new ResponseList();
 
-            var query = _unitOfWork.Repository<MstTypeOfProduct>().Where(x => x.DeleteFlag != true);
+            var query = _unitOfWork.Repository<MstTagOfProduct>().Where(x => x.DeleteFlag != true);
 
             if(!string.IsNullOrEmpty(filter.Title)) query = query.Where(x => x.Title.Contains(filter.Title));
             if(filter.Status != null) query = query.Where(x => x.Status == filter.Status);
@@ -116,9 +116,9 @@ namespace Ecommerce_BE_API.Services.Implements
             return result;
         }
 
-        public async Task<int> UpdateTypeOfProductAsync(MstTypeOfProduct req, int currentUserId)
+        public async Task<int> UpdateTypeOfProductAsync(MstTagOfProduct req, int currentUserId)
         {
-            var request = await _unitOfWork.Repository<MstTypeOfProduct>().Where(x => x.Id == req.Id && x.DeleteFlag != true)
+            var request = await _unitOfWork.Repository<MstTagOfProduct>().Where(x => x.Id == req.Id && x.DeleteFlag != true)
                                                                           .FirstOrDefaultAsync();
 
             if (request == null) return (int)ErrorTypeOfProductCode.ItemNotFound;
@@ -131,7 +131,7 @@ namespace Ecommerce_BE_API.Services.Implements
             request.UpdatedAt = DateTime.Now;
             request.UpdatedBy = currentUserId;
 
-            _unitOfWork.Repository<MstTypeOfProduct>().Update(request);
+            _unitOfWork.Repository<MstTagOfProduct>().Update(request);
             await _unitOfWork.SaveChangesAsync();
 
             return (int)ErrorTypeOfProductCode.Success;

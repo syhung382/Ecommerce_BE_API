@@ -82,7 +82,7 @@ namespace Ecommerce_BE_API.Services.Implements
             result.DeletedIds = productIds;
             result.NotFoundIds = listId.Except(productIds).ToList();
 
-            var allProductType = await _unitOfWork.Repository<InfoProductType>()
+            var allProductType = await _unitOfWork.Repository<InfoProductTag>()
                                                   .Where(x => productIds.Contains(x.ProductId) && x.DeleteFlag != true)
                                                   .ToListAsync();
 
@@ -102,7 +102,7 @@ namespace Ecommerce_BE_API.Services.Implements
                 item.UpdatedBy = currentUserId;
             }
 
-            _unitOfWork.Repository<InfoProductType>().UpdateRange(allProductType);
+            _unitOfWork.Repository<InfoProductTag>().UpdateRange(allProductType);
             _unitOfWork.Repository<MstProduct>().UpdateRange(listResponse);
             await _unitOfWork.SaveChangesAsync();
 
