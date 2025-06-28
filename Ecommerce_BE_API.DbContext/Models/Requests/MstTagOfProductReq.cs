@@ -15,11 +15,18 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
         public bool? DeleteFlag { get; set; }
     }
 
-    public class MstTypeOfProductFilter
+    public class MstTagOfProductFilter
     {
         public string? Title { get; set; }
         public int? Status { get; set; }
         public string? TypeSort { get; set; }
         public bool? IsDesc { get; set; }
+    }
+
+    public class InfoProductTagRes 
+    {
+        public Guid Id { get; set; }
+        public Guid ProductId { get; set; }
+        public Guid Ta
     }
 }

@@ -75,7 +75,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
         [HttpPost]
         [Route("list")]
-        public async Task<ResponseResult<ResponseList>> list([FromBody] MstTypeOfProductFilter filter, int limit = 25, int page = 1)
+        public async Task<ResponseResult<ResponseList>> list([FromBody] MstTagOfProductFilter filter, int limit = 25, int page = 1)
         {
             try
             {

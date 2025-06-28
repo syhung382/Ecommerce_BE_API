@@ -86,7 +86,7 @@ namespace Ecommerce_BE_API.Services.Implements
             return result;
         }
 
-        public async Task<ResponseList> GetListTypeOfProductAsync(MstTypeOfProductFilter filter, int limit = 25, int page = 1)
+        public async Task<ResponseList> GetListTypeOfProductAsync(MstTagOfProductFilter filter, int limit = 25, int page = 1)
         {
             var result = new ResponseList();
 
