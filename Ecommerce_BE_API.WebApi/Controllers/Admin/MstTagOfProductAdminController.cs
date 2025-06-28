@@ -30,7 +30,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
         [HttpPost]
         [Route("create")]
-        public async Task<ResponseResult<string>> create([FromBody] MstTypeOfProductReq req)
+        public async Task<ResponseResult<string>> create([FromBody] MstTagOfProductReq req)
         {
             try
             {

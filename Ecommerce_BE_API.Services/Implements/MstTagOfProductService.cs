@@ -20,7 +20,7 @@ namespace Ecommerce_BE_API.Services.Implements
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
-        public async Task<int> AddTypeOfProductAsync(MstTypeOfProductReq req, int currentUserId)
+        public async Task<int> AddTypeOfProductAsync(MstTagOfProductReq req, int currentUserId)
         {
             if (string.IsNullOrEmpty(req.Title)) return (int)ErrorTypeOfProductCode.TitleEmpty;
             if (!FunctionUtils.IsStatusEnum(req.Status)) return (int)ErrorTypeOfProductCode.InvalidStatus;

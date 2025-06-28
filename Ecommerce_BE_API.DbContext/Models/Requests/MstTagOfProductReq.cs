@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce_BE_API.DbContext.Models.Requests
 {
-    public class MstTypeOfProductReq
+    public class MstTagOfProductReq
     {
 
         public string Title { get; set; } = null!;
