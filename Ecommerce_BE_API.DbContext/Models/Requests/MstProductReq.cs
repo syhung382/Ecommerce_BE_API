@@ -1,12 +1,18 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
+
 namespace Ecommerce_BE_API.DbContext.Models.Requests
 {
     public class MstProductReq
     {
+
+        [Required]
         public Guid CategoryId { get; set; }
 
         public Guid? DiscountId { get; set; }
 
+
+        [Required]
         public string Title { get; set; } = null!;
 
         public string? Description { get; set; }
@@ -15,10 +21,14 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
 
         public string? Image { get; set; }
 
+
+        [Required]
         public int Price { get; set; }
 
         public int? PriceSale { get; set; }
 
+
+        [Required]
         public int Status { get; set; }
         public bool? DeleteFlag { get; set; }
         public List<Guid>? ListTagId { get; set; }
@@ -26,12 +36,18 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
 
     public class MstProductUpdateReq
     {
+
+        [Required]
         public Guid Id { get; set; }
 
+
+        [Required]
         public Guid CategoryId { get; set; }
 
         public Guid? DiscountId { get; set; }
 
+
+        [Required]
         public string Title { get; set; } = null!;
 
         public string? Description { get; set; }
@@ -40,10 +56,14 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
 
         public string? Image { get; set; }
 
+
+        [Required]
         public int Price { get; set; }
 
         public int? PriceSale { get; set; }
 
+
+        [Required]
         public int Status { get; set; }
 
         public bool DeleteFlag { get; set; }

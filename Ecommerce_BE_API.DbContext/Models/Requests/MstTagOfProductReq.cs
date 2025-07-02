@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,8 +10,12 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
     public class MstTagOfProductReq
     {
 
+
+        [Required]
         public string Title { get; set; } = null!;
 
+
+        [Required]
         public int Status { get; set; }
         public bool? DeleteFlag { get; set; }
     }
