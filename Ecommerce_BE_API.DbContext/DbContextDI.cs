@@ -12,7 +12,14 @@ namespace Ecommerce_BE_API.DbContext
         {
             services.AddScoped<IContext, Ecommerce_BE_APIContext>();
             services.AddScoped(typeof(IGenericDbContext<>), typeof(GenericDbContext<>));
-            services.AddDbContext<Ecommerce_BE_APIContext>(options => options.UseSqlServer(connectString, o => o.CommandTimeout(180)));
+            services.AddDbContext<Ecommerce_BE_APIContext>(options =>
+                                                                    options.UseSqlServer(connectString, o =>
+                                                                    {
+                                                                        o.CommandTimeout(180); // thời gian timeout command = 180 giây
+                                                                        o.EnableRetryOnFailure(); // bật retry khi có lỗi tạm thời
+                                                                    })
+                                                                );
+
             return services;
         }
     }

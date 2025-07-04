@@ -91,6 +91,7 @@ namespace Ecommerce_BE_API.WebApi
             services.AddScoped<IMstCategoryService, MstCategoryService>();
             services.AddScoped<IMstProductService, MstProductService>();
             services.AddScoped<IMstTagOfProductService, MstTagOfProductService>();
+            services.AddScoped<IInfoImageService, InfoImageService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // Schedule task

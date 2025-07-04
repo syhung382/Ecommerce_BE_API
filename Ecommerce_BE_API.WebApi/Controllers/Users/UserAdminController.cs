@@ -43,5 +43,53 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
                 return new ResponseResult<string>(RetCodeEnum.ApiError, ex.Message, null);
             }
         }
+
+        [HttpGet]
+        [Route("check_user_by_token")]
+        public async Task<ResponseResult<UserLoginRes>> checkUserByToken()
+        {
+            try
+            {
+                var currentUserId = GetCurrentUserId();
+                var currentUserSession = GetCurrentUserSession();
+
+                var res = await _userService.getUserFromId(currentUserId);
+                if (res == null) throw new Exception("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!");
+                if(res.CurrentSession != currentUserSession) throw new Exception("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!");
+                if (res.IsBanned == (int)BannedEnum.Yes) throw new Exception("Tài khoản bị khóa!");
+                if (res.Status == (int)UserStatusEnum.TemporarilyDeleted) throw new Exception("Tài khoản đang tạm xóa!");
+
+                var result = new UserLoginRes()
+                {
+                    Id = res.Id,
+                    Avatar = res.Avatar,
+                    CodeInvite = res.CodeInvite,
+                    CreatedAt = res.CreatedAt,
+                    CreatedBy = res.CreatedBy,
+                    CurrentSession = currentUserSession,
+                    Email = res.Email,
+                    FullName = res.FullName,
+                    Gender = res.Gender,
+                    InviteUserCount = res.InviteUserCount,
+                    InviteUserId = res.InviteUserId,
+                    IsFirstLogin = res.IsFirstLogin,
+                    LastLoginDate = res.LastLoginDate,
+                    Role = res.Role,
+                    RoleAdmin = res.RoleAdmin,
+                    Token = "",
+                    UpdatedAt = res.UpdatedAt,
+                    UpdatedBy = res.UpdatedBy,
+                    UserName = res.UserName,
+                };
+
+                return new ResponseResult<UserLoginRes>(RetCodeEnum.Ok, "Đăng nhập thành công", result);
+
+            }
+            catch (Exception ex)
+            {
+                await _logger.WriteErrorLogAsync(ex, Request);
+                return new ResponseResult<UserLoginRes>(RetCodeEnum.ApiError, ex.Message, null);
+            }
+        }
     }
 }

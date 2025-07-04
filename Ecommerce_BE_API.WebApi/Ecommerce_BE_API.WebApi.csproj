@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\Client\" />
     <Folder Include="Extensions\" />
     <Folder Include="Models\Request\" />
     <Folder Include="Models\Utils\" />

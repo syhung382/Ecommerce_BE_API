@@ -1,5 +1,4 @@
 ﻿using Ecommerce_BE_API.DbContext.Base;
-using Ecommerce_BE_API.DbContext.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
@@ -50,6 +49,15 @@ namespace Ecommerce_BE_API.DbContext.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<InfoImage>(entity =>
+            {
+                entity.ToTable("InfoImage");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+                entity.Property(e => e.ImageUrl).HasMaxLength(250);
+                entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+            });
             modelBuilder.Entity<InfoProductTag>(entity =>
             {
                 entity.ToTable("InfoProductTag");

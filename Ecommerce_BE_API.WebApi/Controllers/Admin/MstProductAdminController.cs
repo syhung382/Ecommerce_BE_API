@@ -58,7 +58,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
         [HttpPut]
         [Route("update")]
-        public async Task<ResponseResult<string>> update([FromBody] MstProduct req)
+        public async Task<ResponseResult<string>> update([FromBody] MstProductRes req)
         {
             try
             {

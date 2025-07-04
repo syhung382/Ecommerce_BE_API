@@ -20,6 +20,6 @@ namespace Ecommerce_BE_API.Services.Interfaces
         Task<MstUser> AddUserInfoAsync(MstUserRegisterReq userRequest, MstUser userInvite, int? currentId, bool IsActive = false);
         Task<MstUser> SyncUserInfoByUsernamePasswordAsync(LoginReq loginReq);
         Task<MstUser> UpdateUserInfoAsync(MstUser user);
-
+        Task<MstUser> getUserFromId(int id);
     }
 }

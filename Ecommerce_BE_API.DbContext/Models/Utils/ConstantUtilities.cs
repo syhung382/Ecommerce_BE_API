@@ -122,4 +122,10 @@ namespace Ecommerce_BE_API.DbContext.Models.Utils
         InvalidStatus = 2,
         TitleEmpty = 3,
     }
+    public enum ErrorImageCode
+    {
+        Success = 0,
+        UserNotFound = 1,
+        ItemIsEmpty = 2,
+    }
 }
