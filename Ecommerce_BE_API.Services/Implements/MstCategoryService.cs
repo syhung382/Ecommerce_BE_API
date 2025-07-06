@@ -1,4 +1,5 @@
-﻿using Ecommerce_BE_API.DbContext.Common;
+﻿using Azure;
+using Ecommerce_BE_API.DbContext.Common;
 using Ecommerce_BE_API.DbContext.Models;
 using Ecommerce_BE_API.DbContext.Models.Requests;
 using Ecommerce_BE_API.DbContext.Models.Utils;
@@ -103,13 +104,33 @@ namespace Ecommerce_BE_API.Services.Implements
                 query = query.OrderByDescending(o => o.CreatedAt);
             }
 
-            query = query.AsNoTracking();
-
             var totalRow = await query.CountAsync();
             result.Paging = new Paging(totalRow, page, limit);
             int start = result.Paging.start;
-            var responseList = await query.Skip(start).Take(limit).ToListAsync();
-            result.ListData = responseList;
+            var responseList = await query.Skip(start).Take(limit).AsNoTracking().ToListAsync();
+
+            var listParentId = responseList.Where(x => x.ParentId != null).Select(x => x.ParentId).Distinct().ToList();
+
+            var listCategory = await _unitOfWork.Repository<MstCategory>().Where(x => 
+                                                                                    x.DeleteFlag != true && 
+                                                                                    listParentId.Contains(x.Id))
+                                                                            .AsNoTracking().ToListAsync();
+            var resList = responseList.Select(item => new MstCategryRes()
+            {
+                Id = item.Id,
+                Title = item.Title,
+                ParentCategory = item.ParentId != null ? listCategory.FirstOrDefault(x => x.Id == item.ParentId) : null,
+                Image = item.Image,
+                Description = item.Description,
+                Status = item.Status,
+                DeleteFlag = item.DeleteFlag,
+                CreatedAt = item.CreatedAt,
+                CreatedBy = item.CreatedBy,
+                UpdatedAt = item.UpdatedAt,
+                UpdatedBy = item.UpdatedBy,
+            }).ToList();
+
+            result.ListData = resList;
             return result;
         }
 
@@ -173,6 +194,26 @@ namespace Ecommerce_BE_API.Services.Implements
             }
 
             return result;
+        }
+
+        public async Task<List<MstCategory>> GetListCategoryNotParentAsync(MstCategoryFilter filter)
+        {
+
+            var query = _unitOfWork.Repository<MstCategory>().Where(x => x.DeleteFlag != true && x.ParentId == null);
+
+            if (!string.IsNullOrEmpty(filter.Title)) query = query.Where(x => x.Title.ToLower().Contains(filter.Title.ToLower()));
+            if (!string.IsNullOrEmpty(filter.TypeSort))
+            {
+                bool isDesc = filter.IsDesc ?? false;
+                query = FunctionUtils.OrderByDynamic(query, filter.TypeSort, !isDesc);
+            }
+            else
+            {
+                query = query.OrderByDescending(o => o.CreatedAt);
+            }
+            var responseList = await query.AsNoTracking().ToListAsync();
+
+            return responseList;
         }
 
 

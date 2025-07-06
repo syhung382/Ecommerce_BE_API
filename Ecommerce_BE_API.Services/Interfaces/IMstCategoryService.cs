@@ -9,6 +9,7 @@ namespace Ecommerce_BE_API.Services.Interfaces
         Task<int> AddCategoryAsync(MstCategoryReq req, int currentUserId);
         Task<int> UpdateCategoryAsync(MstCategory req, int currentUserId);
         Task<ResponseList> GetListCategoryAsync(MstCategoryFilter filter, int limit = 25, int page = 1);
+        Task<List<MstCategory>> GetListCategoryNotParentAsync(MstCategoryFilter filter);
         Task<MstCategory> GetDetailCategoryAsync(Guid id);
         Task<MstDeletedRes> DeleteCategoryAsync(List<Guid> listId, int currentUserId);
     }
