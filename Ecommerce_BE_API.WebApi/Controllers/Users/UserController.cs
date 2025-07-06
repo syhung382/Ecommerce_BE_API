@@ -103,6 +103,22 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
             }
         }
 
+        [HttpGet]
+        [Route("get-user")]
+        public async Task<ResponseResult<MstUser>> GetUser([FromQuery] int userId)
+        {
+            try
+            {
+                var res = await _userService.getUserFromId(userId);
+
+                return new ResponseResult<MstUser>(RetCodeEnum.Ok, "user: " + res.FullName, res);
+            }
+            catch (Exception ex) {
+                await _logger.WriteErrorLogAsync(ex, Request);
+                return new ResponseResult<MstUser>(RetCodeEnum.ApiError, ex.Message, null);
+            }
+        }
+
         #region "Private Methods"
         private string CreateToken(MstUser user)
         {
