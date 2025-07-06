@@ -21,5 +21,6 @@ namespace Ecommerce_BE_API.Services.Interfaces
         Task<MstUser> SyncUserInfoByUsernamePasswordAsync(LoginReq loginReq);
         Task<MstUser> UpdateUserInfoAsync(MstUser user);
         Task<MstUser> getUserFromId(int id);
+        Task<MstUserRes> getUserFromIdAsync(int id);
     }
 }

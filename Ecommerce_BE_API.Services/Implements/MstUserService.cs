@@ -86,6 +86,25 @@ namespace Ecommerce_BE_API.Services.Implements
             return res;
         }
 
+        public async Task<MstUserRes> getUserFromIdAsync(int id)
+        {
+            var res = await _unitOfWork.Repository<MstUser>().Where(x => x.Id == id && x.DeleteFlag != true)
+                                                             .AsNoTracking().FirstOrDefaultAsync();
+            if (res == null) return null;
+
+            var response = new MstUserRes()
+            {
+                Id = res.Id,
+                FullName = res.FullName,
+                UserName = res.UserName,
+                Avatar = res.Avatar,
+                Email = res.Email,
+                Gender = res.Gender,
+            };
+
+            return response;
+        }
+
         public async Task<MstUser> SyncUserInfoByUsernamePasswordAsync(LoginReq loginReq)
         {
             var KeyEncrypt = Configuration["Tokens:KeyUser"];

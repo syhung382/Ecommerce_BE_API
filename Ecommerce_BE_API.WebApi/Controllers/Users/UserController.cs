@@ -105,17 +105,19 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
 
         [HttpGet]
         [Route("get-user")]
-        public async Task<ResponseResult<MstUser>> GetUser([FromQuery] int userId)
+        public async Task<ResponseResult<MstUserRes>> GetUser([FromQuery] int userId)
         {
             try
             {
-                var res = await _userService.getUserFromId(userId);
+                var res = await _userService.getUserFromIdAsync(userId);
 
-                return new ResponseResult<MstUser>(RetCodeEnum.Ok, "user: " + res.FullName, res);
+                if (res == null) throw new Exception("Tài khoản không tồn tại!");
+
+                return new ResponseResult<MstUserRes>(RetCodeEnum.Ok, "user: " + res.FullName, res);
             }
             catch (Exception ex) {
                 await _logger.WriteErrorLogAsync(ex, Request);
-                return new ResponseResult<MstUser>(RetCodeEnum.ApiError, ex.Message, null);
+                return new ResponseResult<MstUserRes>(RetCodeEnum.ApiError, ex.Message, null);
             }
         }
 
