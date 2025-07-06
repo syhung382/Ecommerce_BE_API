@@ -74,7 +74,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
         [HttpPost]
         [Route("list")]
-        public async Task<ResponseResult<ResponseList>> List(MstCategoryFilter filter, int limit = 25, int page = 1)
+        public async Task<ResponseResult<ResponseList>> List([FromBody]MstCategoryFilter filter, int limit = 25, int page = 1)
         {
             try
             {
@@ -85,6 +85,25 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
                 return new ResponseResult<ResponseList>(RetCodeEnum.ApiError, ex.Message, null);
+            }
+        }
+
+        [HttpPost]
+        [Route("list-no-parent")]
+        public async Task<ResponseResult<List<MstCategory>>> ListNoParent([FromBody] MstCategoryFilter filter)
+        {
+            try
+            {
+                var res = await _categoryService.GetListCategoryNotParentAsync(filter);
+
+                if (res == null) throw new Exception("Danh mục trống!");
+
+                return new ResponseResult<List<MstCategory>>(RetCodeEnum.Ok, "Ok", res);
+            }
+            catch(Exception ex)
+            {
+                await _logger.WriteErrorLogAsync(ex, Request);
+                return new ResponseResult<List<MstCategory>>(RetCodeEnum.ApiError, ex.Message, null);
             }
         }
 

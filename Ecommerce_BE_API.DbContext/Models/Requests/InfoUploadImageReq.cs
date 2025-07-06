@@ -27,4 +27,9 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
         public Guid Id { get; set; }
         public string ImageUrl { get; set; }
     }
+    public class ImageReq
+    {
+        public Guid? Id { get; set; }
+        public string ImageUrl { get; set; }
+    }
 }

@@ -231,5 +231,15 @@ namespace Ecommerce_BE_API.Services.Implements
 
             return result;
         }
+
+        public async Task<InfoImage> GetDetailAsync(string url)
+        {
+            var trimUrl = url.TrimStart('/');
+            var res = await _unitOfWork.Repository<InfoImage>().Where(x => x.DeleteFlag != true)
+                                                               .Where(x => x.ImageUrl == url || x.ImageUrl == trimUrl)
+                                                                .AsNoTracking().FirstOrDefaultAsync();
+
+            return res;
+        }
     }
 }

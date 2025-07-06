@@ -1,4 +1,5 @@
-﻿using Ecommerce_BE_API.DbContext.Models.Requests;
+﻿using Ecommerce_BE_API.DbContext.Models;
+using Ecommerce_BE_API.DbContext.Models.Requests;
 using Ecommerce_BE_API.DbContext.Models.Utils;
 using Ecommerce_BE_API.Services.Interfaces;
 using Ecommerce_BE_API.Services.Logger;
@@ -145,13 +146,21 @@ namespace Ecommerce_BE_API.WebApi.Controllers
         [HttpDelete]
         [Route("delete-image")]
         [Authorize]
-        public async Task<ResponseResult<string>> DeleteImage([FromBody] ImageRes req)
+        public async Task<ResponseResult<string>> DeleteImage([FromBody] ImageReq req)
         {
             try
             {
                 var currentUserId = GetCurrentUserId();
-                var res = await _infoImageService.GetDetailAsync(req.Id);
-                if(res == null)
+                var res = new InfoImage();
+                if(req.Id == null)
+                {
+                    res = await _infoImageService.GetDetailAsync(req.ImageUrl);
+                }
+                else
+                {
+                    res = await _infoImageService.GetDetailAsync(req.Id.Value);
+                }
+                if (res == null)
                 {
                     if (!string.IsNullOrEmpty(req.ImageUrl))
                     {
