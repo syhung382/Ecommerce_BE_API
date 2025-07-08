@@ -269,6 +269,25 @@ namespace Ecommerce_BE_API.Services.Utils
             return String.Format(info, "{0:c}", value);
         }
 
+        public static string RemoveVietnameseTones(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return string.Empty;
+
+            // Normalize to FormD to split accents from letters
+            string normalized = input.Normalize(NormalizationForm.FormD);
+
+            // Remove all accent characters (diacritics)
+            var regex = new Regex(@"\p{IsCombiningDiacriticalMarks}+");
+            string result = regex.Replace(normalized, string.Empty);
+
+            // Replace specific Vietnamese characters
+            result = result.Replace('đ', 'd').Replace('Đ', 'D');
+
+            // Convert to lowercase
+            return result.ToLowerInvariant();
+        }
+
         //check enum
         public static bool IsUserRoleEnum(int value)
         {

@@ -93,7 +93,11 @@ namespace Ecommerce_BE_API.Services.Implements
 
             var query = _unitOfWork.Repository<MstCategory>().Where(x => x.DeleteFlag != true);
 
-            if (!string.IsNullOrEmpty(filter.Title)) query = query.Where(x => x.Title.ToLower().Contains(filter.Title.ToLower()));
+            if (!string.IsNullOrEmpty(filter.Title))
+            {   
+                var keyword = FunctionUtils.RemoveVietnameseTones(filter.Title);
+                query = query.Where(x => x.Title.ToLower().Contains(filter.Title.ToLower()) || x.Title.ToLower().Contains(keyword));
+            }
             if (!string.IsNullOrEmpty(filter.TypeSort))
             {
                 bool isDesc = filter.IsDesc ?? false;
