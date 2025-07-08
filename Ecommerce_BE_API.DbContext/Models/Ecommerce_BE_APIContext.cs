@@ -24,7 +24,7 @@ namespace Ecommerce_BE_API.DbContext.Models
 
         public virtual DbSet<MstProduct> MstProducts { get; set; }
 
-        public virtual DbSet<MstTagOfProduct> MstTypeOfProducts { get; set; }
+        public virtual DbSet<MstTagOfProduct> MstTagOfProducts { get; set; }
 
         public virtual DbSet<MstUser> MstUsers { get; set; }
 
@@ -89,7 +89,7 @@ namespace Ecommerce_BE_API.DbContext.Models
 
             modelBuilder.Entity<MstTagOfProduct>(entity =>
             {
-                entity.ToTable("MstTypeOfProduct");
+                entity.ToTable("MstTagOfProduct");
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
                 entity.Property(e => e.CreatedAt).HasColumnType("datetime");
