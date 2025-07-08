@@ -6,7 +6,7 @@ using Ecommerce_BE_API.Services.Interfaces;
 using Ecommerce_BE_API.Services.Logger;
 using Ecommerce_BE_API.Services.Utils;
 using Ecommerce_BE_API.Services.Utils.Response;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce_BE_API.Services.Implements
 {
