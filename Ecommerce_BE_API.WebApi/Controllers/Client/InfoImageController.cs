@@ -31,6 +31,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Client
 
         [HttpPost]
         [Route("list")]
+        [AuthorizeRole(AdminRoleEnum.Admin, AdminRoleEnum.SuperAdmin)]
         public async Task<ResponseResult<ResponseList>> list([FromBody] InfoImageFilter filter, int limit = 25, int page = 1)
         {
             try
@@ -38,6 +39,24 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Client
                 var res = await _infoImageService.GetListAsync(filter, limit, page);
                 return new ResponseResult<ResponseList>(RetCodeEnum.Ok, "list", res);
             }catch(Exception ex)
+            {
+                await _logger.WriteErrorLogAsync(ex, Request);
+                return new ResponseResult<ResponseList>(RetCodeEnum.ApiError, ex.Message, null);
+            }
+        }
+
+        [HttpPost]
+        [Route("list-user")]
+        public async Task<ResponseResult<ResponseList>> ListUser([FromBody] InfoImageUserFilter filter, int limit = 25, int page = 1)
+        {
+            try
+            {
+                var currentUserId = GetCurrentUserId();
+                var res = await _infoImageService.GetListByUserIdAsync(filter, currentUserId, limit, page);
+
+                return new ResponseResult<ResponseList>(RetCodeEnum.Ok, "successfull!", res);
+            }
+            catch (Exception ex) 
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
                 return new ResponseResult<ResponseList>(RetCodeEnum.ApiError, ex.Message, null);
