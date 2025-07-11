@@ -32,6 +32,7 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
         public int Status { get; set; }
         public bool? DeleteFlag { get; set; }
         public List<Guid>? ListTagId { get; set; }
+        public List<string>? ListImageUrl { get; set; }
     }
 
     public class MstProductUpdateReq
@@ -67,7 +68,8 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
         public int Status { get; set; }
 
         public bool DeleteFlag { get; set; }
-        public List<Guid>? ListTagId { get; set; }
+        public List<InfoProductTagRes>? ListTagRes { get; set; }
+        public List<InfoProductUpdateImageReq>? listProductImage {  get; set; }
     }
     public class MstProductRes
     {
@@ -101,6 +103,7 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
 
         public int? UpdatedBy { get; set; }
         public List<InfoProductTagRes>? ListTagRes { get; set; }
+        public List<InfoProductUpdateImageReq>? listProductImage { get; set; }
     }
 
     public class MstProductFilter

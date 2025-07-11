@@ -58,7 +58,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
         [HttpPut]
         [Route("update")]
-        public async Task<ResponseResult<string>> update([FromBody] MstProductRes req)
+        public async Task<ResponseResult<string>> update([FromBody] MstProductUpdateReq req)
         {
             try
             {
@@ -102,7 +102,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
         [HttpGet]
         [Route("detail/{id}")]
-        public async Task<ResponseResult<MstProduct>> detail(Guid id)
+        public async Task<ResponseResult<MstProductRes>> detail(Guid id)
         {
             try
             {
@@ -110,11 +110,11 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
                 if (res == null) throw new Exception("Sản phẩm không tồn tại!");
 
-                return new ResponseResult<MstProduct>(RetCodeEnum.Ok, "Chi tiết sản phẩm!", res);
+                return new ResponseResult<MstProductRes>(RetCodeEnum.Ok, "Chi tiết sản phẩm!", res);
             }catch(Exception ex)
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
-                return new ResponseResult<MstProduct>(RetCodeEnum.ApiError, ex.Message, null);
+                return new ResponseResult<MstProductRes>(RetCodeEnum.ApiError, ex.Message, null);
             }
         }
 

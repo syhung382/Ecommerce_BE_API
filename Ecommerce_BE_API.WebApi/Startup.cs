@@ -154,6 +154,8 @@ namespace Ecommerce_BE_API.WebApi
 
             app.UseAuthorization();
 
+            app.UseStaticFiles();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

@@ -72,6 +72,25 @@ namespace Ecommerce_BE_API.Services.Implements
 
                 await _unitOfWork.Repository<InfoProductTag>().AddRangeAsync(listProductTags);
             }
+            if(req.ListImageUrl != null && req.ListImageUrl.Any())
+            {
+                var listImage = new List<InfoProductImage>();
+                foreach(var item in req.ListImageUrl)
+                {
+                    var ProudctImage = new InfoProductImage()
+                    {
+                        Id = Guid.NewGuid(),
+                        ProductId = request.Id,
+                        ImageUrl = item,
+                        CreatedAt = DateTime.Now,
+                        CreatedBy = currentUserId,
+                        DeleteFlag = false
+                    };
+                    listImage.Add(ProudctImage);
+                }
+
+                await _unitOfWork.Repository<InfoProductImage>().AddRangeAsync(listImage);
+            }
 
             await _unitOfWork.Repository<MstProduct>().AddAsync(request);
             await _unitOfWork.SaveChangesAsync();
@@ -126,12 +145,83 @@ namespace Ecommerce_BE_API.Services.Implements
             return result;
         }
 
-        public async Task<MstProduct> GetDetailProductAsync(Guid id)
+        public async Task<MstProductRes> GetDetailProductAsync(Guid id)
         {
             var response = await _unitOfWork.Repository<MstProduct>()
                                             .Where(x => x.Id == id && x.DeleteFlag != true)
                                             .AsNoTracking().FirstOrDefaultAsync();
-            return response;
+            if (response == null) return null;
+
+            var result = new MstProductRes()
+            {
+                Id = response.Id,
+                CategoryId = response.CategoryId,
+                Title = response.Title,
+                Description = response.Description,
+                Detail = response.Detail,
+                DiscountId = response.DiscountId,
+                Image = response.Image,
+                Price = response.Price,
+                PriceSale = response.PriceSale,
+                Status = response.Status,
+                CreatedAt = response.CreatedAt,
+                CreatedBy = response.CreatedBy,
+                UpdatedAt = response.UpdatedAt,
+                UpdatedBy = response.UpdatedBy,
+                DeleteFlag = response.DeleteFlag,
+            };
+
+            var listTag = await _unitOfWork.Repository<InfoProductTag>().Where(x => x.ProductId == response.Id && x.DeleteFlag != true)
+                                                                        .AsNoTracking().ToListAsync();
+            if (listTag.Any())
+            {
+                var listTagId = listTag.Select(x => x.Id).ToList();
+                var listTagById = await _unitOfWork.Repository<MstTagOfProduct>().Where(x => x.DeleteFlag != true && listTagId.Contains(x.Id))
+                                                                                 .AsNoTracking().ToListAsync();
+                if(listTagById.Any())
+                {
+                    var listTagRes = new List<InfoProductTagRes>();
+                    foreach (var item in listTagRes)
+                    {
+                        var itemDetail = listTagById.Where(x => x.Id == item.Id).FirstOrDefault();
+                        if(itemDetail != null)
+                        {
+                            var tagRes = new InfoProductTagRes()
+                            {
+                                Id = item.Id,
+                                ProductId = item.ProductId,
+                                TagOfProductId = itemDetail.Id,
+                                TagTitle = itemDetail.Title,
+                            };
+
+                            listTagRes.Add(tagRes);
+                        }
+                       
+                    }
+                    result.ListTagRes = listTagRes;
+                }
+            }
+
+            var listImage = await _unitOfWork.Repository<InfoProductImage>().Where(x => x.DeleteFlag != true && x.ProductId == result.Id)
+                                                                            .AsNoTracking().ToListAsync();
+            if (listImage.Any())
+            {
+                var listImageRes = new List<InfoProductUpdateImageReq>();
+                foreach(var item in listImage)
+                {
+                    var imgRes = new InfoProductUpdateImageReq()
+                    {
+                        Id = item.Id,
+                        ImageUrl = item.ImageUrl,
+
+                    };
+
+                    listImageRes.Add(imgRes);
+                }
+                result.listProductImage = listImageRes;
+            }
+
+            return result;
         }
 
         public async Task<ResponseList> GetListProductAsync(MstProductFilter filter, int limit = 25, int page = 1)
@@ -177,7 +267,7 @@ namespace Ecommerce_BE_API.Services.Implements
             return result;
         }
 
-        public async Task<int> UpdateProductAsync(MstProductRes req, int currentUserId)
+        public async Task<int> UpdateProductAsync(MstProductUpdateReq req, int currentUserId)
         {
             var request = await _unitOfWork.Repository<MstProduct>().Where(x => x.Id == req.Id && x.DeleteFlag != true)
                                             .FirstOrDefaultAsync();
@@ -218,7 +308,7 @@ namespace Ecommerce_BE_API.Services.Implements
             {
                 var tagIds = req.ListTagRes.Select(t => t.TagOfProductId).Distinct().ToList();
 
-                var existingTags = await _unitOfWork.Repository<InfoProductTag>().Where(x => x.ProductId == request.Id && !x.DeleteFlag)
+                var existingTags = await _unitOfWork.Repository<InfoProductTag>().Where(x => x.ProductId == request.Id && x.DeleteFlag != true)
                                                     .ToListAsync();
 
                 var tagIdsExist = existingTags.Select(x => x.TagOfProductId).ToHashSet();
@@ -247,10 +337,45 @@ namespace Ecommerce_BE_API.Services.Implements
                     _unitOfWork.Repository<InfoProductTag>().RemoveRange(tagsToRemove);
             }
 
+            if(req.listProductImage != null && req.listProductImage.Any())
+            {
+                var listProductImageNew = req.listProductImage.Where(x => x.Id == null && x.ImageUrl != null).ToList();
+                var listProductImageAdd = new List<InfoProductImage>();
+                foreach(var item in listProductImageNew)
+                {
+                    var image = new InfoProductImage()
+                    {
+                        Id = Guid.NewGuid(),
+                        ImageUrl = item.ImageUrl,
+                        ProductId = request.Id,
+                        CreatedAt = DateTime.Now,
+                        CreatedBy = currentUserId,
+                        DeleteFlag = false
+                    };
+                    listProductImageAdd.Add(image);
+                }
+
+                await _unitOfWork.Repository<InfoProductImage>().AddRangeAsync(listProductImageAdd);
+
+                var listProductImageId = req.listProductImage.Where(x => x.Id != null).Select(x => x.Id).ToList();
+
+                var listProductImageDelete = await _unitOfWork.Repository<InfoProductImage>().Where(x => 
+                                                                                                    x.DeleteFlag != true && 
+                                                                                                    !listProductImageId.Contains(x.Id) && 
+                                                                                                    x.ProductId == request.Id)
+                                                                                            .ToListAsync();
+                if(listProductImageDelete.Any())
+                {
+                    _unitOfWork.Repository<InfoProductImage>().RemoveRange(listProductImageDelete);
+                }
+                
+            }
+
             _unitOfWork.Repository<MstProduct>().Update(request);
             await _unitOfWork.SaveChangesAsync();
 
             return (int)ErrorProductCode.Success;
         }
+
     }
 }
