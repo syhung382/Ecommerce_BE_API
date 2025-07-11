@@ -89,12 +89,12 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
         }
 
         [HttpPost]
-        [Route("list-no-parent")]
+        [Route("list-dropdown")]
         public async Task<ResponseResult<List<MstCategory>>> ListNoParent([FromBody] MstCategoryFilter filter)
         {
             try
             {
-                var res = await _categoryService.GetListCategoryNotParentAsync(filter);
+                var res = await _categoryService.GetListCategoryDropdownAsync(filter);
 
                 if (res == null) throw new Exception("Danh mục trống!");
 

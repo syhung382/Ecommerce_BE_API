@@ -30,6 +30,7 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
         public int? Status { get; set; }
         public string? TypeSort { get; set; }
         public bool? IsDesc { get; set; }
+        public bool? NoParent {  get; set; }
     }
 
     public class MstCategryRes

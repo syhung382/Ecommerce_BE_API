@@ -200,11 +200,12 @@ namespace Ecommerce_BE_API.Services.Implements
             return result;
         }
 
-        public async Task<List<MstCategory>> GetListCategoryNotParentAsync(MstCategoryFilter filter)
+        public async Task<List<MstCategory>> GetListCategoryDropdownAsync(MstCategoryFilter filter)
         {
 
-            var query = _unitOfWork.Repository<MstCategory>().Where(x => x.DeleteFlag != true && x.ParentId == null);
+            var query = _unitOfWork.Repository<MstCategory>().Where(x => x.DeleteFlag != true);
 
+            if (filter.NoParent == true) query = query.Where(x => x.ParentId == null);
             if (!string.IsNullOrEmpty(filter.Title)) query = query.Where(x => x.Title.ToLower().Contains(filter.Title.ToLower()));
             if (!string.IsNullOrEmpty(filter.TypeSort))
             {
