@@ -75,7 +75,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers
         [Route("upload-image")]
         [Consumes("multipart/form-data")]
         [Authorize]
-        public async Task<ResponseResult<ImageRes>> UploadImage([FromForm] InfoUploadImageReq req)
+        public async Task<ResponseResult<InfoImage>> UploadImage([FromForm] InfoUploadImageReq req)
         {
             string[] permittedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
             const long MaxFileSize = 10 * 1024 * 1024;
@@ -130,16 +130,12 @@ namespace Ecommerce_BE_API.WebApi.Controllers
 
                 var res = await _infoImageService.AddAsync(request, currentUserId);
 
-                var ImageRes = new ImageRes();
-                ImageRes.ImageUrl = imageUrl;
-                ImageRes.Id = res.response.Id;
-
-                return new ResponseResult<ImageRes>(RetCodeEnum.Ok, "Tải lên thành công!", ImageRes);
+                return new ResponseResult<InfoImage>(RetCodeEnum.Ok, "Tải lên thành công!", res.response);
             }
             catch(Exception ex)
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
-                return new ResponseResult<ImageRes>(RetCodeEnum.ApiError, ex.Message, null);
+                return new ResponseResult<InfoImage>(RetCodeEnum.ApiError, ex.Message, null);
             }
         }
 
@@ -192,6 +188,37 @@ namespace Ecommerce_BE_API.WebApi.Controllers
         [HttpGet]
         [Route("get-image")]
         public async Task<IActionResult> GetImage([FromQuery] string imageUrl)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(imageUrl)) throw new Exception("File path is null!");
+                imageUrl = imageUrl.TrimStart('/');
+
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", imageUrl);
+
+                if (!System.IO.File.Exists(filePath)) throw new Exception("Không tìm thấy hình ảnh!");
+
+                var fileInfo = new FileInfo(filePath);
+
+                return Ok(new
+                {
+                    fileName = Path.GetFileName(filePath),
+                    sizeInBytes = fileInfo.Length,
+                    sizeInKb = Math.Round(fileInfo.Length / 1024.0, 2),
+                    contentType = GetContentType(filePath),
+                    relativePath = imageUrl
+                });
+            }
+            catch (Exception ex)
+            {
+                await _logger.WriteErrorLogAsync(ex, Request);
+                return StatusCode(500, "Lỗi hệ thống khi tải hình ảnh!");
+            }
+        }
+
+        [HttpGet]
+        [Route("view-image")]
+        public async Task<IActionResult> ViewImage([FromQuery] string imageUrl)
         {
             try
             {
