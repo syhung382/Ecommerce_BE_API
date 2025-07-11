@@ -196,6 +196,42 @@ namespace Ecommerce_BE_API.Services.Implements
             return result;
         }
 
+        public async Task<ResponseList> GetListByUserIdAsync(InfoImageUserFilter filter, int userID, int limit = 25, int page = 1)
+        {
+            var result = new ResponseList();
+
+            var query = _unitOfWork.Repository<InfoImage>().Where(x => x.DeleteFlag != true && x.UserId == userID);
+
+            if (filter.StartDate.HasValue)
+            {
+                query = query.Where(x => x.CreatedAt >= filter.StartDate);
+            }
+            if (filter.EndDate.HasValue)
+            {
+                query = query.Where(x => x.CreatedAt <= filter.EndDate);
+            }
+
+            if (!string.IsNullOrEmpty(filter.TypeSort))
+            {
+                bool isDesc = filter.IsDesc ?? false;
+                query = FunctionUtils.OrderByDynamic(query, filter.TypeSort, !isDesc);
+            }
+            else
+            {
+                query = query.OrderByDescending(o => o.CreatedAt);
+            }
+
+            query = query.AsNoTracking();
+
+            var totalRow = await query.CountAsync();
+            result.Paging = new Paging(totalRow, page, limit);
+            int start = result.Paging.start;
+            var responseList = await query.Skip(start).Take(limit).ToListAsync();
+            result.ListData = responseList;
+
+            return result;
+        }
+
         public async Task<MstDeletedRes> HardDeleteAsync(List<Guid> listId, int currentUserId)
         {
             var result = new MstDeletedRes();

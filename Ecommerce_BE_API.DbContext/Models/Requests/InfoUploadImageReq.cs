@@ -17,6 +17,14 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
         public bool? IsDesc { get; set; }
     }
 
+    public class InfoImageUserFilter
+    {
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string? TypeSort { get; set; }
+        public bool? IsDesc { get; set; }
+    }
+
     public class InfoImageReq
     {
         [Required]

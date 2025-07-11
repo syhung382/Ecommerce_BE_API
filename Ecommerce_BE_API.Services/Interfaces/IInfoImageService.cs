@@ -14,6 +14,7 @@ namespace Ecommerce_BE_API.Services.Interfaces
         Task<ResponseService<InfoImage>> AddAsync(InfoImageReq req, int currentUserId);
         Task<ResponseService<InfoImage>> UpdateAsync(InfoImage req, int currentUserId);
         Task<ResponseList> GetListAsync(InfoImageFilter filter, int limit = 25, int page = 1);
+        Task<ResponseList> GetListByUserIdAsync(InfoImageUserFilter filter, int userID, int limit = 25, int page = 1);
         Task<InfoImage> GetDetailAsync(Guid id);
         Task<InfoImage> GetDetailAsync(string url);
         Task<MstDeletedRes> DeleteAsync(List<Guid> listId, int currentUserId);
