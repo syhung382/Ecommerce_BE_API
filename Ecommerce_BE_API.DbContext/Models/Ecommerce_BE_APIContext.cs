@@ -18,7 +18,12 @@ namespace Ecommerce_BE_API.DbContext.Models
         {
         }
 
-        public virtual DbSet<InfoProductTag> InfoProductTypes { get; set; }
+
+        public virtual DbSet<InfoImage> InfoImages { get; set; }
+
+        public virtual DbSet<InfoProductImage> InfoProductImages { get; set; }
+
+        public virtual DbSet<InfoProductTag> InfoProductTags { get; set; }
 
         public virtual DbSet<MstCategory> MstCategories { get; set; }
 
@@ -58,6 +63,17 @@ namespace Ecommerce_BE_API.DbContext.Models
                 entity.Property(e => e.ImageUrl).HasMaxLength(250);
                 entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
             });
+
+            modelBuilder.Entity<InfoProductImage>(entity =>
+            {
+                entity.ToTable("InfoProductImage");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+                entity.Property(e => e.ImageUrl).HasMaxLength(250);
+                entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+            });
+
             modelBuilder.Entity<InfoProductTag>(entity =>
             {
                 entity.ToTable("InfoProductTag");
