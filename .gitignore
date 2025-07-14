@@ -181,6 +181,7 @@ DocProject/Help/html
 publish/
 
 Ecommerce_BE_API.DbContext/Models/drafts
+Ecommerce_BE_API.WebApi/appsettings.json
 
 # Publish Web Output
 *.[Pp]ublish.xml

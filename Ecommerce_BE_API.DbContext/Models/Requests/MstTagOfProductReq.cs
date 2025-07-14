@@ -30,9 +30,9 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
 
     public class InfoProductTagRes 
     {
-        public Guid Id { get; set; }
-        public Guid ProductId { get; set; }
+        public Guid? Id { get; set; }
+        public Guid? ProductId { get; set; }
         public Guid TagOfProductId { get; set; }
-        public string TagTitle { get; set; }
+        public string? TagTitle { get; set; }
     }
 }

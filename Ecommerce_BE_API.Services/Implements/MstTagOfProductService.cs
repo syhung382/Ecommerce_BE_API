@@ -120,6 +120,32 @@ namespace Ecommerce_BE_API.Services.Implements
             return result;
         }
 
+        public async Task<List<MstTagOfProduct>> getListDropdown(MstTagOfProductFilter filter)
+        {
+            var query = _unitOfWork.Repository<MstTagOfProduct>().Where(x => x.DeleteFlag != true);
+
+            if (!string.IsNullOrEmpty(filter.Title))
+            {
+                var keyword = FunctionUtils.RemoveVietnameseTones(filter.Title);
+                query = query.Where(x => x.Title.Contains(filter.Title) || x.Title.ToLower().Contains(keyword));
+            }
+            if (filter.Status != null) query = query.Where(x => x.Status == filter.Status);
+
+            if (!string.IsNullOrEmpty(filter.TypeSort))
+            {
+                bool isDesc = filter.IsDesc ?? false;
+                query = FunctionUtils.OrderByDynamic(query, filter.TypeSort, !isDesc);
+            }
+            else
+            {
+                query = query.OrderByDescending(o => o.CreatedAt);
+            }
+
+            var result = await query.AsNoTracking().ToListAsync();
+
+            return result;
+        }
+
         public async Task<int> UpdateTypeOfProductAsync(MstTagOfProduct req, int currentUserId)
         {
             var request = await _unitOfWork.Repository<MstTagOfProduct>().Where(x => x.Id == req.Id && x.DeleteFlag != true)

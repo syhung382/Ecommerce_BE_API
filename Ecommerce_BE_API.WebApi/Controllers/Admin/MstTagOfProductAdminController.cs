@@ -90,6 +90,21 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
             }
         }
 
+        [HttpPost]
+        [Route("list-dropdown")]
+        public async Task<ResponseResult<List<MstTagOfProduct>>> listDropdown([FromBody] MstTagOfProductFilter filter)
+        {
+            try
+            {
+                var res = await _typeOfProductService.getListDropdown(filter);
+                return new ResponseResult<List<MstTagOfProduct>>(RetCodeEnum.Ok, "list tag", res);
+            }catch(Exception ex)
+            {
+                await _logger.WriteErrorLogAsync(ex, Request);
+                return new ResponseResult<List<MstTagOfProduct>>(RetCodeEnum.ApiError, ex.Message, null);
+            }
+        }
+
         [HttpGet]
         [Route("detail/{id}")]
         public async Task<ResponseResult<MstTagOfProduct>> detail(Guid id)

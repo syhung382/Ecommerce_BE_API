@@ -58,7 +58,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
         [HttpPut]
         [Route("update")]
-        public async Task<ResponseResult<string>> update([FromBody] MstProductUpdateReq req)
+        public async Task<ResponseResult<string>> update([FromBody] MstProductReq req)
         {
             try
             {
@@ -90,6 +90,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
             try
             {
                 var res = await _productService.GetListProductAsync(filter, limit, page);
+
 
                 return new ResponseResult<ResponseList>(RetCodeEnum.Ok, "Danh sách sản phẩm!", res);
             }

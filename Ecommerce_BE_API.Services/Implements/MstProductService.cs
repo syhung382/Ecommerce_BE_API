@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Configuration;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
+using System.Diagnostics;
 
 namespace Ecommerce_BE_API.Services.Implements
 {
@@ -46,7 +47,7 @@ namespace Ecommerce_BE_API.Services.Implements
                 Detail = req.Detail,
                 Image = req.Image,
                 PriceSale = req.PriceSale,
-                DeleteFlag = req.DeleteFlag ?? false,
+                DeleteFlag = req.DeleteFlag,
                 Status = req.Status,
                 CreatedAt = DateTime.Now,
                 CreatedBy = currentUserId,
@@ -57,31 +58,32 @@ namespace Ecommerce_BE_API.Services.Implements
                 request.DiscountId = req.DiscountId;
             }
 
-            if (req.ListTagId != null && req.ListTagId.Any())
+            if (req.ListTagRes != null && req.ListTagRes.Any())
             {
                 var timeNow = DateTime.Now;
 
-                var listProductTags = req.ListTagId.Select(tagId => new InfoProductTag
+                var listProductTags = req.ListTagRes.Select(item => new InfoProductTag
                 {
                     Id = Guid.NewGuid(),
                     ProductId = request.Id,
-                    TagOfProductId = tagId,
+                    TagOfProductId = item.TagOfProductId,
                     CreatedAt = timeNow,
                     CreatedBy = currentUserId,
                 }).ToList();
 
                 await _unitOfWork.Repository<InfoProductTag>().AddRangeAsync(listProductTags);
             }
-            if(req.ListImageUrl != null && req.ListImageUrl.Any())
+            if(req.listProductImage != null && req.listProductImage.Any())
             {
                 var listImage = new List<InfoProductImage>();
-                foreach(var item in req.ListImageUrl)
+                foreach(var item in req.listProductImage)
                 {
                     var ProudctImage = new InfoProductImage()
                     {
                         Id = Guid.NewGuid(),
                         ProductId = request.Id,
-                        ImageUrl = item,
+                        ImageId = item.ImageId,
+                        ImageUrl = item.ImageUrl,
                         CreatedAt = DateTime.Now,
                         CreatedBy = currentUserId,
                         DeleteFlag = false
@@ -98,180 +100,11 @@ namespace Ecommerce_BE_API.Services.Implements
             return (int)ErrorProductCode.Success;
         }
 
-        public async Task<MstDeletedRes> DeleteProductAsync(List<Guid> listId, int currentUserId)
-        {
-            var result = new MstDeletedRes();
-
-            if (listId == null || !listId.Any()) return result;
-
-            var listResponse = await _unitOfWork.Repository<MstProduct>()
-                                                .Where(x => listId.Contains(x.Id) && x.DeleteFlag != true)
-                                                .ToListAsync();
-            if (!listResponse.Any())
-            {
-                result.NotFoundIds = listId;
-                return result;
-            }
-
-            var productIds = listResponse.Select(p => p.Id).ToList();
-
-            result.DeletedIds = productIds;
-            result.NotFoundIds = listId.Except(productIds).ToList();
-
-            var allProductTag = await _unitOfWork.Repository<InfoProductTag>()
-                                                  .Where(x => productIds.Contains(x.ProductId) && x.DeleteFlag != true)
-                                                  .ToListAsync();
-
-            var utcNow = DateTime.Now;
-
-            foreach (var item in allProductTag)
-            {
-                item.DeleteFlag = true;
-                item.UpdatedAt = utcNow;
-                item.UpdatedBy = currentUserId;
-            }
-
-            foreach (var item in listResponse)
-            {
-                item.DeleteFlag = true;
-                item.UpdatedAt = utcNow;
-                item.UpdatedBy = currentUserId;
-            }
-
-            _unitOfWork.Repository<InfoProductTag>().UpdateRange(allProductTag);
-            _unitOfWork.Repository<MstProduct>().UpdateRange(listResponse);
-            await _unitOfWork.SaveChangesAsync();
-
-            return result;
-        }
-
-        public async Task<MstProductRes> GetDetailProductAsync(Guid id)
-        {
-            var response = await _unitOfWork.Repository<MstProduct>()
-                                            .Where(x => x.Id == id && x.DeleteFlag != true)
-                                            .AsNoTracking().FirstOrDefaultAsync();
-            if (response == null) return null;
-
-            var result = new MstProductRes()
-            {
-                Id = response.Id,
-                CategoryId = response.CategoryId,
-                Title = response.Title,
-                Description = response.Description,
-                Detail = response.Detail,
-                DiscountId = response.DiscountId,
-                Image = response.Image,
-                Price = response.Price,
-                PriceSale = response.PriceSale,
-                Status = response.Status,
-                CreatedAt = response.CreatedAt,
-                CreatedBy = response.CreatedBy,
-                UpdatedAt = response.UpdatedAt,
-                UpdatedBy = response.UpdatedBy,
-                DeleteFlag = response.DeleteFlag,
-            };
-
-            var listTag = await _unitOfWork.Repository<InfoProductTag>().Where(x => x.ProductId == response.Id && x.DeleteFlag != true)
-                                                                        .AsNoTracking().ToListAsync();
-            if (listTag.Any())
-            {
-                var listTagId = listTag.Select(x => x.Id).ToList();
-                var listTagById = await _unitOfWork.Repository<MstTagOfProduct>().Where(x => x.DeleteFlag != true && listTagId.Contains(x.Id))
-                                                                                 .AsNoTracking().ToListAsync();
-                if(listTagById.Any())
-                {
-                    var listTagRes = new List<InfoProductTagRes>();
-                    foreach (var item in listTagRes)
-                    {
-                        var itemDetail = listTagById.Where(x => x.Id == item.Id).FirstOrDefault();
-                        if(itemDetail != null)
-                        {
-                            var tagRes = new InfoProductTagRes()
-                            {
-                                Id = item.Id,
-                                ProductId = item.ProductId,
-                                TagOfProductId = itemDetail.Id,
-                                TagTitle = itemDetail.Title,
-                            };
-
-                            listTagRes.Add(tagRes);
-                        }
-                       
-                    }
-                    result.ListTagRes = listTagRes;
-                }
-            }
-
-            var listImage = await _unitOfWork.Repository<InfoProductImage>().Where(x => x.DeleteFlag != true && x.ProductId == result.Id)
-                                                                            .AsNoTracking().ToListAsync();
-            if (listImage.Any())
-            {
-                var listImageRes = new List<InfoProductUpdateImageReq>();
-                foreach(var item in listImage)
-                {
-                    var imgRes = new InfoProductUpdateImageReq()
-                    {
-                        Id = item.Id,
-                        ImageUrl = item.ImageUrl,
-
-                    };
-
-                    listImageRes.Add(imgRes);
-                }
-                result.listProductImage = listImageRes;
-            }
-
-            return result;
-        }
-
-        public async Task<ResponseList> GetListProductAsync(MstProductFilter filter, int limit = 25, int page = 1)
-        {
-            var result = new ResponseList();
-
-            var query = _unitOfWork.Repository<MstProduct>().Where(x => x.DeleteFlag != true);
-
-            if (!string.IsNullOrEmpty(filter.Title))
-            {
-                var keyword = FunctionUtils.RemoveVietnameseTones(filter.Title);
-                query = query.Where(x => x.Title.ToLower().Contains(filter.Title) || x.Title.ToLower().Contains(keyword));
-            }
-
-            if(filter.CategoryId != null) query = query.Where(x => x.CategoryId == filter.CategoryId);
-
-            if (filter.StartPrice != null) query = query.Where(x => (x.PriceSale != null && x.PriceSale >= filter.StartPrice)
-                                                                    || (x.PriceSale == null && x.Price >= filter.StartPrice));
-
-            if (filter.EndPrice != null) query = query.Where(x => (x.PriceSale != null && x.PriceSale <= filter.EndPrice)
-                                                                    || (x.PriceSale == null && x.Price <= filter.EndPrice));
-
-            if(filter.Status != null) query = query.Where(x => x.Status == filter.Status);
-
-            if (!string.IsNullOrEmpty(filter.TypeSort))
-            {
-                bool isDesc = filter.IsDesc ?? false;
-                query = FunctionUtils.OrderByDynamic(query, filter.TypeSort, !isDesc);
-            }
-            else
-            {
-                query = query.OrderByDescending(o => o.CreatedAt);
-            }
-
-            query = query.AsNoTracking();
-
-            var totalRow = await query.CountAsync();
-            result.Paging = new Paging(totalRow, page, limit);
-            int start = result.Paging.start;
-            var responseList = await query.Skip(start).Take(limit).ToListAsync();
-            result.ListData = responseList;
-
-            return result;
-        }
-
-        public async Task<int> UpdateProductAsync(MstProductUpdateReq req, int currentUserId)
+        public async Task<int> UpdateProductAsync(MstProductReq req, int currentUserId)
         {
             var request = await _unitOfWork.Repository<MstProduct>().Where(x => x.Id == req.Id && x.DeleteFlag != true)
                                             .FirstOrDefaultAsync();
-            if(request == null) return (int)ErrorProductCode.ItemNotFound;
+            if (request == null) return (int)ErrorProductCode.ItemNotFound;
 
             if (string.IsNullOrEmpty(req.Title)) return (int)ErrorProductCode.TitleEmpty;
 
@@ -336,16 +169,23 @@ namespace Ecommerce_BE_API.Services.Implements
                 if (tagsToRemove.Any())
                     _unitOfWork.Repository<InfoProductTag>().RemoveRange(tagsToRemove);
             }
+            else
+            {
+                var removeTag = await _unitOfWork.Repository<InfoProductTag>().Where(x => x.ProductId == request.Id)
+                                                    .ToListAsync();
+                _unitOfWork.Repository<InfoProductTag>().RemoveRange(removeTag);
+            }
 
-            if(req.listProductImage != null && req.listProductImage.Any())
+            if (req.listProductImage != null && req.listProductImage.Any())
             {
                 var listProductImageNew = req.listProductImage.Where(x => x.Id == null && x.ImageUrl != null).ToList();
                 var listProductImageAdd = new List<InfoProductImage>();
-                foreach(var item in listProductImageNew)
+                foreach (var item in listProductImageNew)
                 {
                     var image = new InfoProductImage()
                     {
                         Id = Guid.NewGuid(),
+                        ImageId = item.ImageId,
                         ImageUrl = item.ImageUrl,
                         ProductId = request.Id,
                         CreatedAt = DateTime.Now,
@@ -359,22 +199,194 @@ namespace Ecommerce_BE_API.Services.Implements
 
                 var listProductImageId = req.listProductImage.Where(x => x.Id != null).Select(x => x.Id).ToList();
 
-                var listProductImageDelete = await _unitOfWork.Repository<InfoProductImage>().Where(x => 
-                                                                                                    x.DeleteFlag != true && 
-                                                                                                    !listProductImageId.Contains(x.Id) && 
+                var listProductImageDelete = await _unitOfWork.Repository<InfoProductImage>().Where(x =>
+                                                                                                    x.DeleteFlag != true &&
+                                                                                                    !listProductImageId.Contains(x.Id) &&
                                                                                                     x.ProductId == request.Id)
                                                                                             .ToListAsync();
-                if(listProductImageDelete.Any())
+                if (listProductImageDelete.Any())
                 {
                     _unitOfWork.Repository<InfoProductImage>().RemoveRange(listProductImageDelete);
                 }
-                
+
+            }
+            else
+            {
+                var removeImage = await _unitOfWork.Repository<InfoProductImage>().Where(x => x.ProductId == request.Id).ToListAsync();
+                _unitOfWork.Repository<InfoProductImage>().RemoveRange(removeImage);
             }
 
-            _unitOfWork.Repository<MstProduct>().Update(request);
+                _unitOfWork.Repository<MstProduct>().Update(request);
             await _unitOfWork.SaveChangesAsync();
 
             return (int)ErrorProductCode.Success;
+        }
+
+        public async Task<MstDeletedRes> DeleteProductAsync(List<Guid> listId, int currentUserId)
+        {
+            var result = new MstDeletedRes();
+
+            if (listId == null || !listId.Any()) return result;
+
+            var listResponse = await _unitOfWork.Repository<MstProduct>()
+                                                .Where(x => listId.Contains(x.Id) && x.DeleteFlag != true)
+                                                .ToListAsync();
+            if (!listResponse.Any())
+            {
+                result.NotFoundIds = listId;
+                return result;
+            }
+
+            var productIds = listResponse.Select(p => p.Id).ToList();
+
+            result.DeletedIds = productIds;
+            result.NotFoundIds = listId.Except(productIds).ToList();
+
+            var allProductTag = await _unitOfWork.Repository<InfoProductTag>()
+                                                  .Where(x => productIds.Contains(x.ProductId) && x.DeleteFlag != true)
+                                                  .ToListAsync();
+
+            var utcNow = DateTime.Now;
+
+            foreach (var item in allProductTag)
+            {
+                item.DeleteFlag = true;
+                item.UpdatedAt = utcNow;
+                item.UpdatedBy = currentUserId;
+            }
+
+            foreach (var item in listResponse)
+            {
+                item.DeleteFlag = true;
+                item.UpdatedAt = utcNow;
+                item.UpdatedBy = currentUserId;
+            }
+
+            _unitOfWork.Repository<InfoProductTag>().UpdateRange(allProductTag);
+            _unitOfWork.Repository<MstProduct>().UpdateRange(listResponse);
+            await _unitOfWork.SaveChangesAsync();
+
+            return result;
+        }
+
+        public async Task<MstProductRes> GetDetailProductAsync(Guid id)
+        {
+            var response = await _unitOfWork.Repository<MstProduct>()
+                                            .Where(x => x.Id == id && x.DeleteFlag != true)
+                                            .AsNoTracking().FirstOrDefaultAsync();
+            if (response == null) return null;
+            var category = await _unitOfWork.Repository<MstCategory>().Where(x => x.Id == response.CategoryId && x.DeleteFlag != true)
+                                                                      .AsNoTracking().FirstOrDefaultAsync();
+
+            var result = new MstProductRes()
+            {
+                Id = response.Id,
+                Category = category,
+                Title = response.Title,
+                Description = response.Description,
+                Detail = response.Detail,
+                DiscountId = response.DiscountId,
+                Image = response.Image,
+                Price = response.Price,
+                PriceSale = response.PriceSale,
+                Status = response.Status,
+                CreatedAt = response.CreatedAt,
+                CreatedBy = response.CreatedBy,
+                UpdatedAt = response.UpdatedAt,
+                UpdatedBy = response.UpdatedBy,
+                DeleteFlag = response.DeleteFlag,
+            };
+
+            var listProductTag = await _unitOfWork.Repository<InfoProductTag>().Where(x => x.ProductId == response.Id && x.DeleteFlag != true)
+                                                                        .AsNoTracking().ToListAsync();
+            if (listProductTag.Any())
+            {
+                var listTagId = listProductTag.Select(x => x.TagOfProductId).ToList();
+                var listTagById = await _unitOfWork.Repository<MstTagOfProduct>().Where(x => x.DeleteFlag != true && listTagId.Contains(x.Id))
+                                                                                 .AsNoTracking().ToDictionaryAsync(x => x.Id, x => x.Title);
+
+                var listTagRes = listProductTag.Select(item => new InfoProductTagRes()
+                {
+                    Id = item.Id,
+                    ProductId = item.ProductId,
+                    TagOfProductId = item.TagOfProductId,
+                    TagTitle = listTagById.TryGetValue(item.TagOfProductId, out var title) ? title : "--"
+                }).ToList();
+                result.ListProductTag = listTagRes;
+            }
+
+            var listImage = await _unitOfWork.Repository<InfoProductImage>().Where(x => x.DeleteFlag != true && x.ProductId == result.Id)
+                                                                            .AsNoTracking().ToListAsync();
+            result.listProductImage = listImage;
+
+            return result;
+        }
+
+        public async Task<ResponseList> GetListProductAsync(MstProductFilter filter, int limit = 25, int page = 1)
+        {
+            var result = new ResponseList();
+
+            var query = _unitOfWork.Repository<MstProduct>().Where(x => x.DeleteFlag != true);
+
+            if (!string.IsNullOrEmpty(filter.Title))
+            {
+                var keyword = FunctionUtils.RemoveVietnameseTones(filter.Title);
+                query = query.Where(x => x.Title.ToLower().Contains(filter.Title) || x.Title.ToLower().Contains(keyword));
+            }
+
+            if(filter.CategoryId != null) query = query.Where(x => x.CategoryId == filter.CategoryId);
+
+            if (filter.StartPrice != null) query = query.Where(x => (x.PriceSale != null && x.PriceSale >= filter.StartPrice)
+                                                                    || (x.PriceSale == null && x.Price >= filter.StartPrice));
+
+            if (filter.EndPrice != null) query = query.Where(x => (x.PriceSale != null && x.PriceSale <= filter.EndPrice)
+                                                                    || (x.PriceSale == null && x.Price <= filter.EndPrice));
+
+            if(filter.Status != null) query = query.Where(x => x.Status == filter.Status);
+
+            if (!string.IsNullOrEmpty(filter.TypeSort))
+            {
+                bool isDesc = filter.IsDesc ?? false;
+                query = FunctionUtils.OrderByDynamic(query, filter.TypeSort, !isDesc);
+            }
+            else
+            {
+                query = query.OrderByDescending(o => o.CreatedAt);
+            }
+
+            query = query.AsNoTracking();
+
+            var totalRow = await query.CountAsync();
+            result.Paging = new Paging(totalRow, page, limit);
+            int start = result.Paging.start;
+            
+            var responseList = await query.Skip(start).Take(limit).ToListAsync();
+            var listCategoryId = responseList.Select(x => x.CategoryId).ToList();
+            var listCategory = await _unitOfWork.Repository<MstCategory>().Where(x => x.DeleteFlag != true && listCategoryId.Contains(x.Id))
+                                                                          .AsNoTracking().ToListAsync();
+
+            var response = responseList.Select(item => new MstProductRes()
+            {
+                Id = item.Id,
+                Category = listCategory.FirstOrDefault(x => x.Id == item.CategoryId),
+                Description = item.Description,
+                Detail =   item.Detail,
+                Image = item.Image,
+                Price = item.Price,
+                PriceSale = item.PriceSale,
+                Title = item.Title,
+                DiscountId = item.DiscountId,
+                Status = item.Status,
+                DeleteFlag = item.DeleteFlag,
+                CreatedAt = item.CreatedAt,
+                CreatedBy = item.CreatedBy,
+                UpdatedAt = item.UpdatedAt,
+                UpdatedBy = item.UpdatedBy,
+            }).ToList();
+
+            result.ListData = response;
+
+            return result;
         }
 
     }

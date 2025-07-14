@@ -3,43 +3,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Ecommerce_BE_API.DbContext.Models.Requests
 {
+
     public class MstProductReq
     {
 
-        [Required]
-        public Guid CategoryId { get; set; }
-
-        public Guid? DiscountId { get; set; }
-
-
-        [Required]
-        public string Title { get; set; } = null!;
-
-        public string? Description { get; set; }
-
-        public string? Detail { get; set; }
-
-        public string? Image { get; set; }
-
-
-        [Required]
-        public int Price { get; set; }
-
-        public int? PriceSale { get; set; }
-
-
-        [Required]
-        public int Status { get; set; }
-        public bool? DeleteFlag { get; set; }
-        public List<Guid>? ListTagId { get; set; }
-        public List<string>? ListImageUrl { get; set; }
-    }
-
-    public class MstProductUpdateReq
-    {
-
-        [Required]
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
 
 
         [Required]
@@ -71,11 +39,12 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
         public List<InfoProductTagRes>? ListTagRes { get; set; }
         public List<InfoProductUpdateImageReq>? listProductImage {  get; set; }
     }
+
     public class MstProductRes
     {
         public Guid Id { get; set; }
 
-        public Guid CategoryId { get; set; }
+        public MstCategory? Category { get; set; }
 
         public Guid? DiscountId { get; set; }
 
@@ -102,8 +71,8 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
         public DateTime? UpdatedAt { get; set; }
 
         public int? UpdatedBy { get; set; }
-        public List<InfoProductTagRes>? ListTagRes { get; set; }
-        public List<InfoProductUpdateImageReq>? listProductImage { get; set; }
+        public List<InfoProductTagRes>? ListProductTag { get; set; }
+        public List<InfoProductImage>? listProductImage { get; set; }
     }
 
     public class MstProductFilter
