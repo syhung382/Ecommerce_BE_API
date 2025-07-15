@@ -81,30 +81,6 @@ namespace Ecommerce_BE_API.Services.Utils
                 return preStringMax + yearCurrent + monthCurrent + "-" + maxNumber;
             }
         }
-        public static string GetProductID(string preString, string maxValue, int length)
-        {
-            //Khi tham so select o database la null khoi tao so dau tien
-            if (String.IsNullOrEmpty(maxValue))
-            {
-                string ret = "1";
-                while (ret.Length < length)
-                {
-                    ret = "0" + ret;
-                }
-                return preString + ret;
-            }
-            else
-            {
-                string maxNumber = Regex.Match(maxValue, @"\d+").Value;
-                //Khi thang trong gia tri max bang voi thang create thi cong len cho 1
-                int strToInt = Convert.ToInt32(maxNumber);
-                maxNumber = Convert.ToString(strToInt + 1);
-                while (maxNumber.Length < length)
-                    maxNumber = "0" + maxNumber;
-
-                return preString + maxNumber;
-            }
-        }
         public static string CreateActionCodeCode(int userId, int randomLength = 11)
         {
             var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" + DateTime.Now.ToString("yyyyMMddHHmmss");
@@ -255,7 +231,7 @@ namespace Ecommerce_BE_API.Services.Utils
 
         }
 
-        public static bool Validate(string emailAddress)
+        public static bool ValidateEmail(string emailAddress)
         {
             if (string.IsNullOrEmpty(emailAddress))
                 return false;

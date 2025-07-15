@@ -1,5 +1,7 @@
 ﻿using Ecommerce_BE_API.DbContext.Models;
 using Ecommerce_BE_API.DbContext.Models.Requests;
+using Ecommerce_BE_API.DbContext.Models.Utils;
+using Ecommerce_BE_API.Services.Utils.Response;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using Microsoft.EntityFrameworkCore;
@@ -16,11 +18,13 @@ namespace Ecommerce_BE_API.Services.Interfaces
 {
     public interface IMstUserService
     {
-        Task<MstUser> AddUserInfoAsync(MstUserRegisterReq userRequest);
-        Task<MstUser> AddUserInfoAsync(MstUserRegisterReq userRequest, MstUser userInvite, int? currentId, bool IsActive = false);
+        Task<int> AddUserByRegisterAsync(MstUserRegisterReq userRequest);
+        Task<int> AddUserInfoAsync(MstUserReq request, int role, int currentUserId);
+        Task<int> UpdateUserInfoAsync(MstUser user, int role, int currentUserId);
         Task<MstUser> SyncUserInfoByUsernamePasswordAsync(LoginReq loginReq);
-        Task<MstUser> UpdateUserInfoAsync(MstUser user);
         Task<MstUser> getUserFromId(int id);
-        Task<MstUserRes> getUserFromIdAsync(int id);
+        Task<MstUser> getUserFromUsernameAsync(string username);
+        Task<ResponseList> getListAsync(MstUserFilter filter, int? role, int limit = 25, int page = 1);
+        Task<MstDeletedIntRes> DeleteAsync(List<int> listId, int currentUserId);
     }
 }

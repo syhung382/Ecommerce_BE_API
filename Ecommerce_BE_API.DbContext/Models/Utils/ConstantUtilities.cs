@@ -128,4 +128,18 @@ namespace Ecommerce_BE_API.DbContext.Models.Utils
         UserNotFound = 1,
         ItemIsEmpty = 2,
     }
+    public enum  ErrorUserCode
+    {
+        Success = 0,
+        UserNotAuthorized = 1,
+        ItemNotFound = 2,
+        InvalidEmail = 3,
+        InvalidPassword = 4,
+        InvalidUsername = 5,
+        InExistUsername = 6,
+        InExistEmail = 7,
+        InvalidGender = 8,
+        InvalidUserRole = 9,
+        InvalidAdminRole = 10,
+    }
 }

@@ -30,22 +30,30 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
 
         [HttpPost]
         [Route("UserAdd")]
-        public async Task<ResponseResult<MstUser>> CreateUserAsync([FromBody] MstUserRegisterReq userReq)
+        public async Task<ResponseResult<string>> CreateUserAsync([FromBody] MstUserRegisterReq userReq)
         {
             try
             {
-                if (string.IsNullOrEmpty(userReq.UserName)) throw new Exception("UserName cannot be empty!");
-                if (string.IsNullOrEmpty(userReq.Password)) throw new Exception("Password cannot be empty!");
-                if (string.IsNullOrEmpty(userReq.Email)) throw new Exception("Email cannot be empty!");
+                var res = await _userService.AddUserByRegisterAsync(userReq);
 
-                var res = await _userService.AddUserInfoAsync(userReq);
+                if (res == (int)ErrorUserCode.InvalidEmail) return ResError("Email không hợp lệ!");
+                if (res == (int)ErrorUserCode.InvalidPassword) return ResError("Mật khẩu phải ít nhất 6 ký tự!");
+                if (res == (int)ErrorUserCode.InvalidUsername) return ResError("Tên đăng nhập không hợp lệ!");
+                if (res == (int)ErrorUserCode.InExistUsername) return ResError("Tên đăng nhập đã tồn tại!");
+                if (res == (int)ErrorUserCode.InExistEmail) return ResError("Email đã tồn tại!");
+                if (res == (int)ErrorUserCode.InvalidGender) return ResError("Giới tính không đúng!");
 
-                return new ResponseResult<MstUser>(RetCodeEnum.Ok, "Add user successfully!", res);
+                return new ResponseResult<string>(RetCodeEnum.Ok, "Add user successfully!", null);
             }
             catch (Exception ex)
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
-                return new ResponseResult<MstUser>(RetCodeEnum.ApiError, ex.Message, null);
+                return new ResponseResult<string>(RetCodeEnum.ApiError, ex.Message, null);
+            }
+
+            ResponseResult<string> ResError(string message)
+            {
+                return new ResponseResult<string>(RetCodeEnum.ApiError, message, null);
             }
         }
 
@@ -66,7 +74,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
 
                     response.CurrentSession = randomNumberGenerator.RandomString(8, false);
 
-                    response = await _userService.UpdateUserInfoAsync(response);
+                    await _userService.UpdateUserInfoAsync(response, (int)UserRoleEnum.User, response.Id);
                 }
                 
 
@@ -109,11 +117,21 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
         {
             try
             {
-                var res = await _userService.getUserFromIdAsync(userId);
+                var res = await _userService.getUserFromId(userId);
 
                 if (res == null) throw new Exception("Tài khoản không tồn tại!");
 
-                return new ResponseResult<MstUserRes>(RetCodeEnum.Ok, "user: " + res.FullName, res);
+                var response = new MstUserRes()
+                {
+                    Id = res.Id,
+                    Avatar = res.Avatar,
+                    Email = res.Email,
+                    FullName = res.FullName,
+                    Gender = res.Gender,
+                    UserName = res.UserName,
+                };
+
+                return new ResponseResult<MstUserRes>(RetCodeEnum.Ok, "user: " + res.FullName, response);
             }
             catch (Exception ex) {
                 await _logger.WriteErrorLogAsync(ex, Request);
