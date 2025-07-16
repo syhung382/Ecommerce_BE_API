@@ -330,8 +330,8 @@ namespace Ecommerce_BE_API.Services.Implements
 
             if (!string.IsNullOrEmpty(filter.Title))
             {
-                var keyword = FunctionUtils.RemoveVietnameseTones(filter.Title);
-                query = query.Where(x => x.Title.ToLower().Contains(filter.Title) || x.Title.ToLower().Contains(keyword));
+                var keyword = filter.Title.ToLower();
+                query = query.Where(x => x.Title.ToLower().Contains(keyword));
             }
 
             if(filter.CategoryId != null) query = query.Where(x => x.CategoryId == filter.CategoryId);
