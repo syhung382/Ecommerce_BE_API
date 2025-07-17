@@ -37,15 +37,15 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
             {
                 var currentId = GetCurrentUserId();
 
-                if (req.PriceSale != null && req.PriceSale > req.Price) throw new Exception("Giá tiền khuyễn mãi phải lớn hơn giá tiền gốc!");
+                if (req.PriceSale != null && req.PriceSale > req.Price) return ResponseError("Giá tiền khuyễn mãi phải lớn hơn giá tiền gốc!");
 
                 var res = await _productService.AddProductAsync(req, currentId);
 
-                if (res == (int)ErrorProductCode.TitleEmpty) throw new Exception("Tiêu đề không được để trống!");
-                if (res == (int)ErrorProductCode.CategoryNotFound) throw new Exception("Danh mục không tồn tại!");
-                if (res == (int)ErrorProductCode.InvalidStatus) throw new Exception("Trạng thái không đúng!");
-                if (res == (int)ErrorProductCode.PriceInvalid) throw new Exception("Giá tiền không hợp lệ!");
-                if (res == (int)ErrorProductCode.PriceSaleInvalid) throw new Exception("Giá tiền khuyễn mãi không hợp lệ!");
+                if (res == (int)ErrorProductCode.TitleEmpty) return ResponseError("Tiêu đề không được để trống!");
+                if (res == (int)ErrorProductCode.CategoryNotFound) return ResponseError("Danh mục không tồn tại!");
+                if (res == (int)ErrorProductCode.InvalidStatus) return ResponseError("Trạng thái không đúng!");
+                if (res == (int)ErrorProductCode.PriceInvalid) return ResponseError("Giá tiền không hợp lệ!");
+                if (res == (int)ErrorProductCode.PriceSaleInvalid) return ResponseError("Giá tiền khuyễn mãi không hợp lệ!");
 
                 return new ResponseResult<string>(RetCodeEnum.Ok, "Thêm sản phẩm thành công!", res.ToString());
             }
@@ -53,6 +53,10 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
                 return new ResponseResult<string>(RetCodeEnum.ApiError, ex.Message, null);
+            }
+            ResponseResult<string> ResponseError(string message)
+            {
+                return new ResponseResult<string>(RetCodeEnum.ResultNotExists, message, null);
             }
         }
 
@@ -64,15 +68,15 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
             {
                 var curentId = GetCurrentUserId();
 
-                if (req.PriceSale != null && req.PriceSale > req.Price) throw new Exception("Giá tiền khuyễn mãi phải lớn hơn giá tiền gốc!");
+                if (req.PriceSale != null && req.PriceSale > req.Price) return ResponseError("Giá tiền khuyễn mãi phải lớn hơn giá tiền gốc!");
 
                 var res = await _productService.UpdateProductAsync(req, curentId);
-                if (res == (int)ErrorProductCode.TitleEmpty) throw new Exception("Tiêu đề không được để trống!");
-                if (res == (int)ErrorProductCode.CategoryNotFound) throw new Exception("Danh mục không tồn tại!");
-                if (res == (int)ErrorProductCode.InvalidStatus) throw new Exception("Trạng thái không đúng!");
-                if (res == (int)ErrorProductCode.PriceInvalid) throw new Exception("Giá tiền không hợp lệ!");
-                if (res == (int)ErrorProductCode.PriceSaleInvalid) throw new Exception("Giá tiền khuyễn mãi không hợp lệ!");
-                if (res == (int)ErrorProductCode.ItemNotFound) throw new Exception("Sản phẩm không tồn tại!");
+                if (res == (int)ErrorProductCode.TitleEmpty) return ResponseError("Tiêu đề không được để trống!");
+                if (res == (int)ErrorProductCode.CategoryNotFound)  return ResponseError("Danh mục không tồn tại!");
+                if (res == (int)ErrorProductCode.InvalidStatus) return ResponseError("Trạng thái không đúng!");
+                if (res == (int)ErrorProductCode.PriceInvalid) return ResponseError("Giá tiền không hợp lệ!");
+                if (res == (int)ErrorProductCode.PriceSaleInvalid) return ResponseError("Giá tiền khuyễn mãi không hợp lệ!");
+                if (res == (int)ErrorProductCode.ItemNotFound) return ResponseError("Sản phẩm không tồn tại!");
 
                 return new ResponseResult<string>(RetCodeEnum.Ok, "Cập nhật sản phẩm thành công!", res.ToString());
             }
@@ -80,6 +84,10 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
                 return new ResponseResult<string>(RetCodeEnum.ApiError, ex.Message, null);
+            }
+            ResponseResult<string> ResponseError(string message)
+            {
+                return new ResponseResult<string>(RetCodeEnum.ResultNotExists, message, null);
             }
         }
 
@@ -109,13 +117,17 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
             {
                 var res = await _productService.GetDetailProductAsync(id);
 
-                if (res == null) throw new Exception("Sản phẩm không tồn tại!");
+                if (res == null) return ResponseError("Sản phẩm không tồn tại!");
 
                 return new ResponseResult<MstProductRes>(RetCodeEnum.Ok, "Chi tiết sản phẩm!", res);
             }catch(Exception ex)
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
                 return new ResponseResult<MstProductRes>(RetCodeEnum.ApiError, ex.Message, null);
+            }
+            ResponseResult<MstProductRes> ResponseError(string message)
+            {
+                return new ResponseResult<MstProductRes>(RetCodeEnum.ResultNotExists, message, null);
             }
         }
 

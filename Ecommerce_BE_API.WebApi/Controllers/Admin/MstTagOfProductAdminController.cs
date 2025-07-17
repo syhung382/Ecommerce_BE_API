@@ -38,8 +38,8 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
                 var res = await _typeOfProductService.AddTypeOfProductAsync(req, currentId);
 
-                if (res == (int)ErrorTypeOfProductCode.TitleEmpty) throw new Exception("Tiêu đề không được để trống!");
-                if (res == (int)ErrorTypeOfProductCode.InvalidStatus) throw new Exception("Trạng thái không đúng!");
+                if (res == (int)ErrorTypeOfProductCode.TitleEmpty) return ResponseError("Tiêu đề không được để trống!");
+                if (res == (int)ErrorTypeOfProductCode.InvalidStatus) return ResponseError("Trạng thái không đúng!");
 
                 return new ResponseResult<string>(RetCodeEnum.Ok, "Thêm mới thành công!", res.ToString());
             }
@@ -47,6 +47,10 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
                 return new ResponseResult<string>(RetCodeEnum.ApiError, ex.Message, null);
+            }
+            ResponseResult<string> ResponseError(string message)
+            {
+                return new ResponseResult<string>(RetCodeEnum.ResultNotExists, message, null);
             }
         }
 
@@ -60,9 +64,9 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
                 var res = await _typeOfProductService.UpdateTypeOfProductAsync(req, currentUserId);
 
-                if (res == (int)ErrorTypeOfProductCode.TitleEmpty) throw new Exception("Tiêu đề không được để trống!");
-                if (res == (int)ErrorTypeOfProductCode.InvalidStatus) throw new Exception("Trạng thái không đúng!");
-                if (res == (int)ErrorTypeOfProductCode.ItemNotFound) throw new Exception("Tag không tồn tại!");
+                if (res == (int)ErrorTypeOfProductCode.TitleEmpty) return ResponseError("Tiêu đề không được để trống!");
+                if (res == (int)ErrorTypeOfProductCode.InvalidStatus) return ResponseError("Trạng thái không đúng!");
+                if (res == (int)ErrorTypeOfProductCode.ItemNotFound) return ResponseError("Tag không tồn tại!");
 
                 return new ResponseResult<string>(RetCodeEnum.Ok, "Thêm mới thành công!", res.ToString());
             }
@@ -70,6 +74,10 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
                 return new ResponseResult<string>(RetCodeEnum.ApiError, ex.Message, null);
+            }
+            ResponseResult<string> ResponseError(string message)
+            {
+                return new ResponseResult<string>(RetCodeEnum.ResultNotExists, message, null);
             }
         }
 

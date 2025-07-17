@@ -39,10 +39,10 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
                 var currentUserSession = GetCurrentUserSession();
 
                 var res = await _userService.getUserFromId(currentUserId);
-                if (res == null) throw new Exception("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!");
-                if(res.CurrentSession != currentUserSession) throw new Exception("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!");
-                if (res.IsBanned == (int)BannedEnum.Yes) throw new Exception("Tài khoản bị khóa!");
-                if (res.Status == (int)UserStatusEnum.TemporarilyDeleted) throw new Exception("Tài khoản đang tạm xóa!");
+                if (res == null) return ResponseError("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!");
+                if(res.CurrentSession != currentUserSession) return ResponseError("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!");
+                if (res.IsBanned == (int)BannedEnum.Yes) return ResponseError("Tài khoản bị khóa!");
+                if (res.Status == (int)UserStatusEnum.TemporarilyDeleted) return ResponseError("Tài khoản đang tạm xóa!");
 
                 await _userService.UpdateLastLoginDay(res.Id);
 
@@ -77,6 +77,10 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
                 await _logger.WriteErrorLogAsync(ex, Request);
                 return new ResponseResult<UserLoginRes>(RetCodeEnum.ApiError, ex.Message, null);
             }
+            ResponseResult<UserLoginRes> ResponseError(string message)
+            {
+                return new ResponseResult<UserLoginRes>(RetCodeEnum.ResultNotExists, message, null);
+            }
         }
 
         [HttpPost]
@@ -106,12 +110,12 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
             }catch(Exception ex)
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
-                return ResponseError(ex.Message);
+                return new ResponseResult<string>(RetCodeEnum.ApiError, ex.Message, null);
             }
 
             ResponseResult<string> ResponseError(string message)
             {
-                return new ResponseResult<string>(RetCodeEnum.ApiError, message, null);
+                return new ResponseResult<string>(RetCodeEnum.ResultNotExists, message, null);
             }
         }
 
@@ -142,12 +146,12 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
             catch (Exception ex)
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
-                return ResponseError(ex.Message);
+                return new ResponseResult<string>(RetCodeEnum.ApiError, ex.Message, null);
             }
 
             ResponseResult<string> ResponseError(string message)
             {
-                return new ResponseResult<string>(RetCodeEnum.ApiError, message, null);
+                return new ResponseResult<string>(RetCodeEnum.ResultNotExists, message, null);
             }
         }
 
@@ -163,11 +167,11 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
             }catch(Exception ex)
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
-                return ResponseError(ex.Message);
+                return new ResponseResult<ResponseList>(RetCodeEnum.ApiError, ex.Message, null);
             }
 
             ResponseResult<ResponseList> ResponseError(string message) {
-                return new ResponseResult<ResponseList>(RetCodeEnum.ApiError, message, null);
+                return new ResponseResult<ResponseList>(RetCodeEnum.ResultNotExists, message, null);
             }
         }
 
@@ -186,11 +190,11 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
             catch(Exception ex)
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
-                return ResponseError(ex.Message);
+                return new ResponseResult<MstUser>(RetCodeEnum.ApiError, ex.Message, null);
             }
 
             ResponseResult<MstUser> ResponseError(string message) {
-                return new ResponseResult<MstUser>(RetCodeEnum.ApiError, message, null);
+                return new ResponseResult<MstUser>(RetCodeEnum.ResultNotExists, message, null);
             }
         }
 

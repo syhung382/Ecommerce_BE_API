@@ -36,9 +36,9 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
             try
             {
                 var res = await _categoryService.AddCategoryAsync(req, currentId);
-                if (res == (int)ErrorCategoryCode.ParentNotFound) throw new Exception("Danh mục cha không tồn tại!");
-                if (res == (int)ErrorCategoryCode.InvalidStatus) throw new Exception("Trạng thái không đúng!");
-                if (res == (int)ErrorCategoryCode.TitleEmpty) throw new Exception("Tên không được để trống!");
+                if (res == (int)ErrorCategoryCode.ParentNotFound) return ResponseError("Danh mục cha không tồn tại!");
+                if (res == (int)ErrorCategoryCode.InvalidStatus) return ResponseError("Trạng thái không đúng!");
+                if (res == (int)ErrorCategoryCode.TitleEmpty) return ResponseError("Tên không được để trống!");
 
                 return new ResponseResult<string>(RetCodeEnum.Ok, "Tạo mới danh mục thành công!", res.ToString());
             }
@@ -46,6 +46,10 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
                 return new ResponseResult<string>(RetCodeEnum.ApiError, ex.Message, null);
+            }
+            ResponseResult<string> ResponseError(string message)
+            {
+                return new ResponseResult<string>(RetCodeEnum.ResultNotExists, message, null);
             }
         }
 
@@ -58,10 +62,10 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
                 int currentId = GetCurrentUserId();
                 var res = await _categoryService.UpdateCategoryAsync(req, currentId);
 
-                if (res == (int)ErrorCategoryCode.ItemNotFound) throw new Exception("Danh mục không tồn tại!");
-                if (res == (int)ErrorCategoryCode.ParentNotFound) throw new Exception("Danh mục cha không tồn tại!");
-                if (res == (int)ErrorCategoryCode.InvalidStatus) throw new Exception("Trạng thái không đúng!");
-                if (res == (int)ErrorCategoryCode.TitleEmpty) throw new Exception("Tên không được để trống!");
+                if (res == (int)ErrorCategoryCode.ItemNotFound) return ResponseError("Danh mục không tồn tại!");
+                if (res == (int)ErrorCategoryCode.ParentNotFound) return ResponseError("Danh mục cha không tồn tại!");
+                if (res == (int)ErrorCategoryCode.InvalidStatus) return ResponseError("Trạng thái không đúng!");
+                if (res == (int)ErrorCategoryCode.TitleEmpty) return ResponseError("Tên không được để trống!");
 
                 return new ResponseResult<string>(RetCodeEnum.Ok, "Cập nhật danh mục thành công!", res.ToString());
             }
@@ -69,6 +73,10 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
                 return new ResponseResult<string>(RetCodeEnum.ApiError, ex.Message, null);
+            }
+            ResponseResult<string> ResponseError(string message)
+            {
+                return new ResponseResult<string>(RetCodeEnum.ResultNotExists, message, null);
             }
         }
 
@@ -96,7 +104,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
             {
                 var res = await _categoryService.GetListCategoryDropdownAsync(filter);
 
-                if (res == null) throw new Exception("Danh mục trống!");
+                if (res == null) return new ResponseResult<List<MstCategory>>(RetCodeEnum.ResultNotExists, "Danh mục trống!", null);
 
                 return new ResponseResult<List<MstCategory>>(RetCodeEnum.Ok, "Ok", res);
             }
@@ -105,6 +113,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
                 await _logger.WriteErrorLogAsync(ex, Request);
                 return new ResponseResult<List<MstCategory>>(RetCodeEnum.ApiError, ex.Message, null);
             }
+
         }
 
         [HttpGet]
@@ -115,13 +124,17 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
             {
                 var res = await _categoryService.GetDetailCategoryAsync(id);
 
-                if (res == null) throw new Exception("Danh mục không tồn tại!");
+                if (res == null) return ResponseError("Danh mục không tồn tại!");
 
                 return new ResponseResult<MstCategory>(RetCodeEnum.Ok, RetCodeEnum.Ok.ToString(), res);
             }catch(Exception ex)
             {
                 await _logger.WriteErrorLogAsync(ex, Request);
                 return new ResponseResult<MstCategory>(RetCodeEnum.ApiError, ex.Message, null);
+            }
+            ResponseResult<MstCategory> ResponseError(string message)
+            {
+                return new ResponseResult<MstCategory>(RetCodeEnum.ResultNotExists, message, null);
             }
         }
 

@@ -52,7 +52,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
             ResponseResult<string> ResponseError(string message)
             {
-                return new ResponseResult<string>(RetCodeEnum.ApiError, message, null);
+                return new ResponseResult<string>(RetCodeEnum.ResultNotExists, message, null);
             }
         }
 
@@ -84,7 +84,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
             ResponseResult<string> ResponseError(string message)
             {
-                return new ResponseResult<string>(RetCodeEnum.ApiError, message, null);
+                return new ResponseResult<string>(RetCodeEnum.ResultNotExists, message, null);
             }
         }
 
@@ -106,7 +106,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
             ResponseResult<ResponseList> ResponseError(string message)
             {
-                return new ResponseResult<ResponseList>(RetCodeEnum.ApiError, message, null);
+                return new ResponseResult<ResponseList>(RetCodeEnum.ResultNotExists, message, null);
             }
         }
 
@@ -129,7 +129,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
             ResponseResult<MstUser> ResponseError(string message)
             {
-                return new ResponseResult<MstUser>(RetCodeEnum.ApiError, message, null);
+                return new ResponseResult<MstUser>(RetCodeEnum.ResultNotExists, message, null);
             }
         }
 
