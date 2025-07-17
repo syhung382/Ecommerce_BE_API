@@ -43,6 +43,7 @@ namespace Ecommerce_BE_API.Services.Implements
                 FullName = userRequest.FullName,
                 UserName = userRequest.UserName,
                 Password = EncryPawword(userRequest.Password),
+                Avatar = "default/avt.jpg",
                 IsActived = (int)ActiveEnum.No,
                 Gender = userRequest.Gender,
                 Role = (int)UserRoleEnum.User,
@@ -100,6 +101,11 @@ namespace Ecommerce_BE_API.Services.Implements
                 CreatedBy = currentUserId
             };
 
+            if (string.IsNullOrEmpty(req.Avatar))
+            {
+                request.Avatar = "default/avt.jpg";
+            }
+
             var res = await _unitOfWork.Repository<MstUser>().AddAsync(request);
             await _unitOfWork.SaveChangesAsync();
 
@@ -119,8 +125,7 @@ namespace Ecommerce_BE_API.Services.Implements
             {
                 var keyword = filter.FullName.ToLower();
                 query = query.Where(x => x.FullName != null &&
-                                 (x.FullName.ToLower().Contains(filter.FullName.ToLower()) ||
-                                  FunctionUtils.RemoveVietnameseTones(x.FullName.ToLower()).Contains(keyword)));
+                                 (x.FullName.ToLower().Contains(filter.FullName.ToLower())));
             }
             if(filter.Status != null)
             {
@@ -173,7 +178,7 @@ namespace Ecommerce_BE_API.Services.Implements
             return userRes;
         }
 
-        public async Task<int> UpdateUserInfoAsync(MstUser req, int role, int currentUserId)
+        public async Task<int> UpdateUserInfoAsync(MstUserReq req, int role, int currentUserId)
         {
             var res = await _unitOfWork.Repository<MstUser>().Where(x => x.DeleteFlag != true && x.IsBanned != (int)BannedEnum.Yes && x.Id == req.Id)
                                                                           .FirstOrDefaultAsync();
@@ -190,20 +195,51 @@ namespace Ecommerce_BE_API.Services.Implements
             res.Gender = req.Gender;
             res.Role = role;
             res.RoleAdmin = req.RoleAdmin;
-            res.Status = req.Status;
+
+            if (string.IsNullOrEmpty(req.Avatar))
+            {
+                res.Avatar = "default/avt.jpg";
+            }
 
             _unitOfWork.Repository<MstUser>().Update(res);
             await _unitOfWork.SaveChangesAsync();
             return (int)ErrorUserCode.Success;
 
         }
+
+        public async Task<int> UpdateSessionAsync(int userId, string newSession)
+        {
+            var res = await _unitOfWork.Repository<MstUser>().Where(x => x.Id == userId).FirstOrDefaultAsync();
+            if (res == null) return (int)ErrorUserCode.ItemNotFound;
+
+            res.CurrentSession = newSession;
+            _unitOfWork.Repository<MstUser>().Update(res);
+            await _unitOfWork.SaveChangesAsync();
+            return (int)ErrorUserCode.Success;
+        }
+
+        public async Task<int> UpdateLastLoginDay(int userId)
+        {
+            var res = await _unitOfWork.Repository<MstUser>().Where(x => x.Id == userId).FirstOrDefaultAsync();
+
+            if(res == null) return (int) ErrorUserCode.ItemNotFound;
+
+            res.LastLoginDate = DateTime.Now;
+
+            _unitOfWork.Repository<MstUser>().Update(res);
+            await _unitOfWork.SaveChangesAsync() ;
+
+            return (int)ErrorUserCode.Success;
+        }
+
         public async Task<MstDeletedIntRes> DeleteAsync(List<int> listId, int currentUserId)
         {
             var result = new MstDeletedIntRes();
 
             var listResponse = await _unitOfWork.Repository<MstUser>()
-                                             .Where(x => listId.Any(p => p == x.Id)
-                                                        && x.DeleteFlag != true)
+                                             .Where(x => listId.Contains(x.Id) && 
+                                                        !x.DeleteFlag && 
+                                                        (x.RoleAdmin == null || x.RoleAdmin != (int)AdminRoleEnum.SuperAdmin))
                                              .ToListAsync();
             if (!listResponse.Any())
             {

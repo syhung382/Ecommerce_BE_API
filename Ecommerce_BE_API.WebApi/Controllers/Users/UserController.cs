@@ -74,7 +74,8 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
 
                     response.CurrentSession = randomNumberGenerator.RandomString(8, false);
 
-                    await _userService.UpdateUserInfoAsync(response, (int)UserRoleEnum.User, response.Id);
+                    await _userService.UpdateSessionAsync(response.Id, response.CurrentSession);
+                    await _userService.UpdateLastLoginDay(response.Id);
                 }
                 
 

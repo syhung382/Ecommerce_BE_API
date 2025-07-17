@@ -58,7 +58,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
 
         [HttpPut]
         [Route("update")]
-        public async Task<ResponseResult<string>> update([FromBody] MstUser req)
+        public async Task<ResponseResult<string>> update([FromBody] MstUserReq req)
         {
             try
             {
@@ -118,7 +118,6 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Admin
             {
                 var res = await _userService.getUserFromId(id);
                 if (res.DeleteFlag == true) return ResponseError("Tài khoản bị xóa!");
-                if (res.IsBanned == (int)BannedEnum.Yes) return ResponseError("Tài khoản bị xóa!");
 
                 return new ResponseResult<MstUser>(RetCodeEnum.Ok, "infomation", res);
             }

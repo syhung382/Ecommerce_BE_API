@@ -16,13 +16,13 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
     [ApiController]
     [Authorize]
     [AuthorizeRole(AdminRoleEnum.Admin, AdminRoleEnum.SuperAdmin)]
-    public class UserAdminController : BaseApiController
+    public class MstUserAdminController : BaseApiController
     {
         private readonly ILoggerService _logger;
         private readonly IConfiguration _config;
         private readonly IMstUserService _userService;
 
-        public UserAdminController(ILoggerService logger, IConfiguration config, IMstUserService userService)
+        public MstUserAdminController(ILoggerService logger, IConfiguration config, IMstUserService userService)
         {
             _logger = logger;
             _config = config;
@@ -43,6 +43,8 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
                 if(res.CurrentSession != currentUserSession) throw new Exception("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!");
                 if (res.IsBanned == (int)BannedEnum.Yes) throw new Exception("Tài khoản bị khóa!");
                 if (res.Status == (int)UserStatusEnum.TemporarilyDeleted) throw new Exception("Tài khoản đang tạm xóa!");
+
+                await _userService.UpdateLastLoginDay(res.Id);
 
                 var result = new UserLoginRes()
                 {
@@ -84,7 +86,14 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
             try
             {
                 var currentUserId = GetCurrentUserId();
+                var currentRole = GetCurrentUserRole();
+                if(req.RoleAdmin ==  (int)AdminRoleEnum.SuperAdmin && currentRole != (int)AdminRoleEnum.SuperAdmin)
+                {
+                    return ResponseError("Bạn không có quyền thực hiện hành động này!");
+                }   
+
                 var res = await _userService.AddUserInfoAsync(req, (int)UserRoleEnum.Staff, currentUserId);
+
 
                 if (res == (int)ErrorUserCode.InvalidEmail) return ResponseError("Email không hợp lệ!");
                 if (res == (int)ErrorUserCode.InvalidPassword) return ResponseError("Mật khẩu phải ít nhất 6 ký tự!");
@@ -108,12 +117,16 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
 
         [HttpPut]
         [Route("update")]
-        public async Task<ResponseResult<string>> update([FromBody]MstUser req)
+        public async Task<ResponseResult<string>> update([FromBody] MstUserReq req)
         {
             try
             {
                 var currentUserId = GetCurrentUserId();
-                
+                var currentRole = GetCurrentUserRole();
+                if (req.RoleAdmin == (int)AdminRoleEnum.SuperAdmin && currentRole != (int)AdminRoleEnum.SuperAdmin)
+                {
+                    return ResponseError("Bạn không có quyền thực hiện hành động này!");
+                }
                 var res = await _userService.UpdateUserInfoAsync(req, (int)UserRoleEnum.Staff, currentUserId);
 
                 if (res == (int)ErrorUserCode.InvalidEmail) return ResponseError("Email không hợp lệ!");
@@ -188,6 +201,7 @@ namespace Ecommerce_BE_API.WebApi.Controllers.Users
             try
             {
                 var currentUserId = GetCurrentUserId();
+
                 var res = await _userService.DeleteAsync(listDel, currentUserId);
 
                 return new ResponseResult<MstDeletedIntRes>(RetCodeEnum.Ok, "Xóa thành công!", res);
