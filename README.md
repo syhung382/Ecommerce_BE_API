@@ -26,6 +26,7 @@ This is the backend API for an **Ecommerce Demo Platform**, developed using **AS
 You can try the live API with Swagger at:
 
 👉 [https://iamkazu.bsite.net/swagger](https://iamkazu.bsite.net/swagger)
+👉 user: admin/123456
 
 ## 📦 Frontend
 
