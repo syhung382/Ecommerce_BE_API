@@ -166,5 +166,20 @@ namespace Ecommerce_BE_API.Services.Implements
 
             return (int)ErrorTypeOfProductCode.Success;
         }
+
+        public async Task<List<MstTagOfProduct>> getListHasProductAsync(int limit = 10)
+        {
+            var ProductTagIds = await _unitOfWork.Repository<InfoProductTag>()
+                                                .Where(x => x.DeleteFlag != true)
+                                                .Distinct()
+                                                .AsNoTracking()
+                                                .Select(s => s.TagOfProductId)
+                                                .ToListAsync();
+
+            var listTag = await _unitOfWork.Repository<MstTagOfProduct>().Where(x => x.DeleteFlag != true && ProductTagIds.Contains(x.Id))
+                                                                         .AsNoTracking().ToListAsync();
+
+            return listTag;
+        }
     }
 }

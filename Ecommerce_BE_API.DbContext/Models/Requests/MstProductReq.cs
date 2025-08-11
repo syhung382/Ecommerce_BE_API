@@ -85,5 +85,18 @@ namespace Ecommerce_BE_API.DbContext.Models.Requests
         public string? TypeSort { get; set; }
         public bool? IsDesc { get; set; }
     }
-    
+    public class MstProductFilter2
+    {
+        public List<Guid>? CategoryIds { get; set; }
+        public List<Guid>? TagIds { get; set; }
+        public string? Title { get; set; }
+        public int? StartPrice { get; set; }
+        public int? EndPrice { get; set; }
+        public bool? IsRandom { get; set; }
+        public bool? IsSale { get; set; }
+        public int? Status { get; set; }
+        public string? TypeSort { get; set; }
+        public bool? IsDesc { get; set; }
+    }
+
 }

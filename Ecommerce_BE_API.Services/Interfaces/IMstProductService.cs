@@ -10,6 +10,7 @@ namespace Ecommerce_BE_API.Services.Interfaces
         Task<int> AddProductAsync(MstProductReq req, int currentUserId);
         Task<int> UpdateProductAsync(MstProductReq req, int currentUserId);
         Task<ResponseList> GetListProductAsync(MstProductFilter filter, int limit = 25, int page = 1);
+        Task<ResponseList> GetListProductAsync(MstProductFilter2 filter, int limit = 25, int page = 1);
         Task<MstProductRes> GetDetailProductAsync(Guid id);
         Task<MstDeletedRes> DeleteProductAsync(List<Guid> listId, int currentUserId);
     }

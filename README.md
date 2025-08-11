@@ -74,12 +74,6 @@ cd ecommerce-demo-webpage
     "Issuer": "YOUR_ISSUER_NAME",
     // Optional: used for user-specific token validation
     "KeyUser": "YOUR_USER_KEY_SECRET"
-  },
-
-  "HeaderRequestConfigure": {
-    "application-json": "application/json",
-    "Language": "vi",
-    "X_Op_Expires_Header": "1000"
   }
 }
 ```

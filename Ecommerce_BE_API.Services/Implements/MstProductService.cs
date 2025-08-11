@@ -8,6 +8,7 @@ using Ecommerce_BE_API.Services.Utils;
 using Ecommerce_BE_API.Services.Utils.Response;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Configuration;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Diagnostics;
@@ -371,6 +372,95 @@ namespace Ecommerce_BE_API.Services.Implements
                 Category = listCategory.FirstOrDefault(x => x.Id == item.CategoryId),
                 Description = item.Description,
                 Detail =   item.Detail,
+                Image = item.Image,
+                Price = item.Price,
+                PriceSale = item.PriceSale,
+                Title = item.Title,
+                DiscountId = item.DiscountId,
+                Status = item.Status,
+                DeleteFlag = item.DeleteFlag,
+                CreatedAt = item.CreatedAt,
+                CreatedBy = item.CreatedBy,
+                UpdatedAt = item.UpdatedAt,
+                UpdatedBy = item.UpdatedBy,
+            }).ToList();
+
+            result.ListData = response;
+
+            return result;
+        }
+
+        public async Task<ResponseList> GetListProductAsync(MstProductFilter2 filter, int limit = 25, int page = 1)
+        {
+            var result = new ResponseList();
+
+            var query = _unitOfWork.Repository<MstProduct>().Where(x => x.DeleteFlag != true);
+
+            if (filter.TagIds != null && filter.TagIds.Any())
+            {
+                var ProductTagIds = await _unitOfWork.Repository<InfoProductTag>()
+                                                        .Where(x => x.DeleteFlag != true && filter.TagIds.Contains(x.TagOfProductId))
+                                                        .AsNoTracking()
+                                                        .Select(s => s.ProductId)
+                                                        .ToListAsync();
+                query = query.Where(x => ProductTagIds.Contains(x.Id));
+            }
+
+            if (filter.IsSale != null && filter.IsSale == true) query = query.Where(x => x.PriceSale != null);
+
+            if (!string.IsNullOrEmpty(filter.Title))
+            {
+                var keyword = filter.Title.ToLower();
+                query = query.Where(x => x.Title.ToLower().Contains(keyword));
+            }
+
+            if (filter.CategoryIds != null && filter.CategoryIds.Any())
+            {
+                query = query.Where(x => filter.CategoryIds.Contains(x.CategoryId));
+            }
+
+            if (filter.StartPrice != null) query = query.Where(x => (x.PriceSale != null && x.PriceSale >= filter.StartPrice)
+                                                                    || (x.PriceSale == null && x.Price >= filter.StartPrice));
+
+            if (filter.EndPrice != null) query = query.Where(x => (x.PriceSale != null && x.PriceSale <= filter.EndPrice)
+                                                                    || (x.PriceSale == null && x.Price <= filter.EndPrice));
+
+            if (filter.Status != null) query = query.Where(x => x.Status == filter.Status);
+
+            if (filter.IsRandom != null && filter.IsRandom == true)
+            {
+                query = query.OrderBy(x => EF.Functions.Random());
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(filter.TypeSort))
+                {
+                    bool isDesc = filter.IsDesc ?? false;
+                    query = FunctionUtils.OrderByDynamic(query, filter.TypeSort, !isDesc);
+                }
+                else
+                {
+                    query = query.OrderByDescending(o => o.CreatedAt);
+                }
+            }
+
+            query = query.AsNoTracking();
+
+            var totalRow = await query.CountAsync();
+            result.Paging = new Paging(totalRow, page, limit);
+            int start = result.Paging.start;
+
+            var responseList = await query.Skip(start).Take(limit).ToListAsync();
+            var listCategoryId = responseList.Select(x => x.CategoryId).ToList();
+            var listCategory = await _unitOfWork.Repository<MstCategory>().Where(x => x.DeleteFlag != true && listCategoryId.Contains(x.Id))
+                                                                          .AsNoTracking().ToListAsync();
+
+            var response = responseList.Select(item => new MstProductRes()
+            {
+                Id = item.Id,
+                Category = listCategory.FirstOrDefault(x => x.Id == item.CategoryId),
+                Description = item.Description,
+                Detail = item.Detail,
                 Image = item.Image,
                 Price = item.Price,
                 PriceSale = item.PriceSale,

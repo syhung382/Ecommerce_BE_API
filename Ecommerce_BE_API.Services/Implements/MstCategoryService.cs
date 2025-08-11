@@ -221,6 +221,26 @@ namespace Ecommerce_BE_API.Services.Implements
             return responseList;
         }
 
+        public async Task<List<MstCategory>> GetListCategoryHasProductAsync(int limit = 25)
+        {
+            var categoriesWithProducts = await _unitOfWork.Repository<MstProduct>()
+                .Where(p => !p.DeleteFlag)
+                .Select(p => p.CategoryId)
+                .Distinct()
+                .Join(
+                    _unitOfWork.Repository<MstCategory>(),
+                    productCategoryId => productCategoryId,
+                    category => category.Id,
+                    (productCategoryId, category) => category
+                )
+                .Where(c => !c.DeleteFlag) 
+                .OrderBy(c => c.Title)     
+                .Take(limit)
+                .ToListAsync();
+
+            return categoriesWithProducts;
+        }
+
 
         #region "Private Methods"
         private async Task<Guid?> ValidateParentId(Guid? parentId)
